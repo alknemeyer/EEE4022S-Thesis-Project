@@ -1,0 +1,2 @@
+model_checkpoint_path: "2_mnist_advanced_model-1000"
+all_model_checkpoint_paths: "2_mnist_advanced_model-1000"

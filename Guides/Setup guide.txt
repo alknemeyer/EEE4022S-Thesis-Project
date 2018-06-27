@@ -1,0 +1,71 @@
+### BRIEF:
+
+Now, for your vac work I would like you to get the hardware (Neural Stick + Raspberry Pi) talking to one another and then interface this to a single servo motor. This will require you getting the all the systems talking to one another. Also, getting to grips with Tensor flow and the Raspberry Pi. I’ve also bought a PI cam for the tracking
+
+For you thesis/Final year project you will then use this to:
+	Develop a single axis camera tracker for humans and dogs/cheetahs using a single servo-motor. A standard servo will work
+	Develop a 3D camera tracker (using an off-the-shelf or opensource gimbal) which will first test on a static position and then mount to a quadcopter once we’re more confident.
+
+
+
+### RASPBERRY PI 3 SETUP:
+
+Basic headless setup:
+	https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0
+
+Enable ssh, pi camera and changed keyboard localisation using:
+> sudo raspi-config
+
+Get ip address using
+> hostname -I
+name:		pi
+hostname:	Alex-Pi
+password:	qweasdzxc
+connect:	ssh pi@196.42.79.34
+
+Set up wifi by copying wpa_supplicant.conf contents to /etc/wpa_supplicant/wpa_supplicant.conf
+
+Get installed programs up to date:
+> sudo apt update
+> sudo apt upgrade
+If  getting problems with "dependancy 20":
+> sudo rm /var/lib/apt/lists/* -vf
+> sudo apt update
+
+??? Optionally change shell:
+> chsh -s $(which zsh)
+
+??? Set up no-ip for easier raspberry pi access:
+    http://www.noip.com/support/knowledgebase/install-ip-duc-onto-raspberry-pi/
+
+
+Install python and some useful libraries:
+	> sudo apt install python3 python3-pip python3-dev
+	> pip3 install numpy tensorflow keras h5py matplotlib
+
+
+
+### MOVIDIUS NCS SETUP:
+
+Go through these links in order:
+	https://movidius.github.io/ncsdk/index.html#Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	https://developer.movidius.com/start
+        > mkdir -p ~/workspace && cd ~/workspace && git clone https://github.com/movidius/ncsdk.git && cd ~/workspace/ncsdk && make install && cd ~/workspace/ncsdk && make examples
+		"make install" takes about 2 hours to run
+        "make examples" takes literally an entire working day - NOT SURE WHETHER THIS STEP IS NECESSARY
+
+    Do tests using these links????
+    ?? https://github.com/movidius/ncsdk
+	?? https://github.com/movidius/ncappzoo
+
+
+
+### LEARNING MACHINE LEARNING:
+
+fast.ai course by Jeremy Howard of kaggle fame:
+	http://course.fast.ai/start.html
+    See "AWS guide.txt" for help on setting up + using Amazon Web Services for cloud based ML
+
+TensorFlow:
+    https://www.tensorflow.org/versions/master/get_started/

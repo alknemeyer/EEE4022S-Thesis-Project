@@ -1,0 +1,32 @@
+### HOW TO GET UCT WIFI WORKING ON LINUX VIA COMMAND LINE:
+
+> nano /etc/wpa_supplicant/wpa_supplicant.conf
+
+In wpa_supplicant.conf, change the contents to the lines between the %%:
+
+%%
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=ZA
+
+network={
+	ssid="eduroam"
+	scan_ssid=1
+	key_mgmt=WPA-EAP
+	eap=PEAP
+	group=CCMP TKIP
+	identity="STUDENT_NUMBER_HERE@wf.uct.ac.za"
+	password="PASSWORD_HERE"
+	ca_cert="/home/pi/.cat_installer/ca.pem"
+	domain_suffix_match="uct.ac.za"
+	phase2="auth=MSCHAPV2"
+}
+
+%%
+
+Reboot using
+> shutdown -r now
+
+Check whether the wifi is working by pinging Google's servers:
+> ping 8.8.8.8
+If you get a response (some writing with a number in milliseconds) then all should be good

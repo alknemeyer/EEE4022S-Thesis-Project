@@ -1,0 +1,100 @@
+### DAILY WORKFLOW:
+
+In bash:
+    Update $instanceId:
+    > aws-get-p2
+    Start the instance (equivalent of going to GUI and then clicking start):
+    > aws-start
+    ssh in and create a localhost connection thingy:
+    > ssh -i /home/alex/.ssh/aws-key.pem ubuntu@ec2-35-161-120-150.us-west-2.compute.amazonaws.com -L 8888:127.0.0.1:8888
+    or modify the aws alias file to include the above command under:
+    > aws-ssh
+
+    Stop the instance (ie stop billing):
+    > aws-stop
+
+In the ubuntu instance:
+    See server info using:
+    > nvidia-smi
+
+    Activate notebook (note down the port number - probably :8888):
+    > jupyter notebook
+    Then go to web browser and enter in localhost:8888
+    Password is dl_course
+
+    TMUX (use it for things like splitting windows, etc):
+        > tmux
+        > tmux attach       (gets things back as they were before. things were never shut down)
+        > Ctrl+b ?          (get help)
+        > Ctrl+b "          (split window vertically)
+        > Ctrl+b %          (split window horizontally)
+        > Ctrl+b (arrow)    (switch between panes)
+        > Ctrl+b D          (detach)
+
+In the jupyter notebook:
+    ??<function> gives info
+    <shift><tab> on function a couple times does too
+
+Kaggle competitions:
+    FIRST TIME: install the kaggle command line interface:
+    > python -m pip install kaggle-cli
+    From then on, go to competition page and accept the terms and conditions. Then, in the AWS instance:
+    > kg config -g -u 'alknemeyer' -p 'MY_PASSWORD' -c 'COMPETITION_NAME'
+    > kg download
+
+### FIRST TIME SETUP:
+
+First time setup. Using bash:
+> sudo apt-get install python-pip python-dev build-essential
+> pip install awscli
+> aws configure
+	AWS access key id:			AKIAIM7WJDHHRZJ7XEVQ
+	AWS secret access key id:	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
+	Location:					us-west-2
+	Output:						text
+
+> wget http://files.fast.ai/files/setup_p2.sh
+> bash setup_p2.sh
+Output - ie AWS setup details:
+	securityGroupId=sg-37f3184a
+	subnetId=subnet-0bf12443
+	instanceId=i-0aa0cf477fbaf81ec
+	instanceUrl=ec2-35-161-120-150.us-west-2.compute.amazonaws.com
+	Connect: ssh -i /home/alex/.ssh/aws-key.pem ubuntu@ec2-35-161-120-150.us-west-2.compute.amazonaws.com
+
+Connect using:
+> ssh -i /home/alex/.ssh/aws-key.pem ubuntu@ec2-35-161-120-150.us-west-2.compute.amazonaws.com
+See server info using:
+> nvidia-smi
+Allow location history:
+> sudo rm .bash_history
+Check notebook:
+> jupyter notebook
+Note down the port number - probably :8888
+Go to web browser and enter in $instanceUrl + port number
+eg ec2-35-161-120-150.us-west-2.compute.amazonaws.com:8888
+Password is dl_course
+IMPORTANT: to shut down, go to 	west-2.console.aws.amazon.com/ec2/v2/home?region=us-west-2#Instances
+click actions > instance state > stop
+
+
+Set up AWS aliases (aws-start, aws-stop, etc):
+    > wget http://files.fast.ai/files/aws-alias.sh
+    > nano .bashrc
+    Add at end:
+    > source aws-alias.sh
+
+ask amazon for id of p2 instance
+> aws-get-p2
+start. equivalent of going to GUI and then clicking start
+> aws-start
+ssh in
+> aws-ssh
+AMI = Amazon Machine Image = snapshot of a computer at a particular time. In this course, we're given an AMI with python etc
+shut down notebook
+> ctrl+c
+stop instance
+> aws-stop
+
+download notebooks (on aws instance)
+> git clone https://github.com/fastai/courses.git
