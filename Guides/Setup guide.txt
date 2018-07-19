@@ -6,20 +6,75 @@ For you thesis/Final year project you will then use this to:
 	Develop a single axis camera tracker for humans and dogs/cheetahs using a single servo-motor. A standard servo will work
 	Develop a 3D camera tracker (using an off-the-shelf or opensource gimbal) which will first test on a static position and then mount to a quadcopter once we’re more confident.
 
+### RASPBERRY PI 3 SETUP:
+# install raspbian
+1.1	download latest version of raspbian-stretch (from https://www.raspberrypi.org/downloads/raspbian/). If you know your way around linux and want something more minimal, use raspbian-stretch-lite (which is what I did). However, it doesn't have a lot of the graphical libraries needed for computer vision so it requires some extra work which probably isn't worth it
+1.2	flash to SD card using etcher (from etcher.io)
+1.3 eject card, reinsert
+1.4 copy 'wpa_supplicant.conf' and 'ssh' to the root of the home folder
+
+# enable things
+2.1	easiest way to set things up: plug in a keyboard + monitor, insert the SD card and then power the device
+		(otherwise, follow the "basic headless setup" described here: https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0)
+2.2	if doing the easy method, type in 'pi' as username, 'raspberry' as password
+2.3	type `sudo raspi-config` to get to the raspberry configuration page
+2.4	look around in the settings. Make sure to:
+		enable ssh and the pi camera
+		change the keyboard localisation to English (US) if shift+2 = @
+		enter some basic gibberish info in the wifi setup page (to initialise it)
+		change hostname from raspberrypi to something else
+
+# set up wifi
+3.1	next, connect the raspberry pi to your laptop/PC using an ethernet cable
+3.2	on the raspberry pi, type `hostname -I` to get the IP address
+3.3	download FileZilla, and transfer wpa_supplicant.conf (file in repo) to the home directory /home/pi
+3.4	add in your username and password to wpa_supplicant.conf
+3.5	on the raspberrypi, move wpa_supplicant.conf using `sudo mv wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf`
+3.6 reboot the pi using `sudo shutdown -r now`
+
+# set up noip
+4.1	follow guide at http://www.noip.com/support/knowledgebase/install-ip-duc-onto-raspberry-pi/
+4.2	type `sudo nano /etc/rc.local` and type `sudo /usr/local/bin/noip2` one line above the last one (return 0 or something)
+4.3 reboot - type `sudo noip2 ­-S` to confirm noip is running on startup
+4.4	now, if you need the raspberrypi ip address, you can go to `https://my.noip.com/#!/dynamic-dns` and find it there
+
+At this point you might find it preferable to ssh into the pi from your laptop, so that you can more easily copypaste commands
+
+# install/update software
+5.1 `sudo apt update` `sudo apt upgrade`
+		If getting problems with "dependancy 20": `sudo rm /var/lib/apt/lists/* -vf` `sudo apt update`
+5.2 `sudo apt install git python3 python3-pip python3-dev cython`
+5.3	`pip3 install numpy`
+
+# install movidius in api only mode
+6.1	sudo apt-get install libusb-1.0-0-dev
+6.2 `mkdir -p ~/workspace && cd ~/workspace && git clone -b ncsdk2 https://github.com/movidius/ncsdk.git && cd ~/workspace/ncsdk/api/src && make && sudo make install`
+6.3 download and test examples: `git clone -b ncsdk2 https://github.com/movidius/ncappzoo.git && cd ncappzoo/apps/hello_ncs_py && python3 hello_ncs.py`
+
+
+
+
+# installing opencv
+1	sudo apt install libatlas-base-dev
+2	follow instructions at: https://github.com/webmproject/libwebp
+3	sudo ln -s /usr/local/lib/libwebp.so.7 /usr/lib/libwebp.so.6 (.7 exists, .6 doesn't)
+4	sudo apt-get install libtiff5 libjasper1 libilmbase12 openexr libgstreamer1.0-0
+ or maybe: https://github.com/jabelone/OpenCV-for-Pi ??
+
 
 
 ### RASPBERRY PI 3 SETUP:
 
 Basic headless setup:
-	https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0
+	https://hackernoon.com/raspberry-pi-headless-install-462ccabd75d0	
 
-Enable ssh, pi camera and changed keyboard localisation using:
+Enable ssh, pi camera and changed keyboard localisation (English (US) if shift+2 = @) using:
 > sudo raspi-config
 
 Get ip address using
 > hostname -I
 name:		pi
-hostname:	Alex-Pi
+hostname:	alex-pi
 password:	qweasdzxc
 connect:	ssh pi@196.42.79.34
 
@@ -42,7 +97,6 @@ If  getting problems with "dependancy 20":
 Install python and some useful libraries:
 	> sudo apt install python3 python3-pip python3-dev
 	> pip3 install numpy tensorflow keras h5py matplotlib
-
 
 
 ### MOVIDIUS NCS SETUP:
@@ -69,3 +123,14 @@ fast.ai course by Jeremy Howard of kaggle fame:
 
 TensorFlow:
     https://www.tensorflow.org/versions/master/get_started/
+
+
+### useful thing:
+> sudo apt install tree
+> tree --filelimit 10 --dirsfirst
+
+
+Example scripts for NCS:
+	https://github.com/movidius/ncappzoo/tree/ncsdk2/apps
+Install MVNC in API-only mode:
+	https://movidius.github.io/blog/ncs-apps-on-rpi/

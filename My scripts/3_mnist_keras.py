@@ -15,19 +15,27 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 import matplotlib.pyplot as plt
 import numpy as np
+import tensorflow as tf
+from alk_lib import save_model, export_mvnc_graph
+import os
 
 # choose either 'mnist_fashion' or 'mnist'
 dataset = 'mnist'
-model_name = '3_' + dataset + '_keras.h5'
+model_name = '3_' + dataset + '_keras'
+
+# disable tensorflow logging stuff (eg using AVX instructions)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 def main():
-    # create_dnn(batch_size=128, epochs=3)
-    test_dnn()
+    create_dnn(batch_size=128, epochs=1, train=False)
+
+#    evaluate_models('3_mnist_keras', ['model_complete_with_dropout.h5',
+#                                      'model_complete.h5'])
     # print_nn_layer_outputs()
 
 
-def create_dnn(batch_size=128, epochs=3):
+def create_dnn(batch_size=128, epochs=3, train=True):
     (x_train, y_train), (x_test, y_test), input_shape, num_classes = get_data()
 
     # minute 12 of sirav "How To Deploy Keras Models to Production"
@@ -47,29 +55,55 @@ def create_dnn(batch_size=128, epochs=3):
                   optimizer=keras.optimizers.Adadelta(),
                   metrics=['accuracy'])
 
-    hist = model.fit(x_train, y_train,
-                     batch_size=batch_size,
-                     epochs=epochs,
-                     verbose=1,
-                     validation_data=(x_test, y_test))
-    score = model.evaluate(x_test, y_test, verbose=0)
-    print('Test loss:', score[0])
-    print('Test accuracy:', score[1])
+#    model.summary()
 
-    print(hist.history)
+    if train is True:
+        hist = model.fit(x_train, y_train,
+                         batch_size=batch_size,
+                         epochs=epochs,
+                         verbose=1,
+                         validation_data=(x_test, y_test))
+        score = model.evaluate(x_test, y_test, verbose=0)
+        print('Test loss:', score[0])
+        print('Test accuracy:', score[1])
+
+        print(hist.history)
+
+        model.save('3_mnist_keras/model_complete_with_dropout.h5')
+        model.save_weights('3_mnist_keras/model_weights.h5')
 
     # save:
-    #   the architecture of the model, allowing to re-create the model,
-    #   the weights of the model,
-    #   the training configuration (loss, optimizer),
-    #   the state of the optimizer, allowing to resume training
-    #   exactly where you left off
-    model.save(model_name)
+
+    del model
+
+    model = Sequential()
+    model.add(Conv2D(32, kernel_size=(3, 3),
+                     activation='relu',
+                     input_shape=input_shape))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+#    model.add(Dropout(0.25))
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+#    model.add(Dropout(0.5))
+    model.add(Dense(num_classes, activation='softmax'))
+
+    model.compile(loss=keras.losses.categorical_crossentropy,
+                  optimizer=keras.optimizers.Adadelta(),
+                  metrics=['accuracy'])
+
+    model.load_weights('3_mnist_keras/model_weights.h5')
+
+#    export_mvnc_graph(model, '3_mnist_keras')
+#    save_model(model, '3_mnist_keras')
+
+#    print('\n\nmvNCCompile model_pb.pb\
+#           -in=conv2d_3_input -on=dense_4/Softmax -s 12')
 
 
-def test_dnn():
+def test_dnn(model_dir):
     (x_train, y_train), (x_test, y_test), _, _ = get_data()
-    model = keras.models.load_model(model_name)
+    model = keras.models.load_model(model_dir)
 
     for i in range(5):
         pixels = x_test[i, :, :, 0]
@@ -95,6 +129,15 @@ def test_dnn():
                    'Ankle boot']
             plt.title('Predicted: ' + tmp[pred] + '    Actual: ' + tmp[actual])
         plt.show()
+
+
+def evaluate_models(dir_name, list_of_model_names):
+    (x_train, y_train), (x_test, y_test), _, _ = get_data()
+
+    for model_name in list_of_model_names:
+        model = keras.models.load_model(dir_name + '/' + model_name)
+        score = model.evaluate(x_test, y_test, verbose=0)
+        print('%s: test accuracy: %f' % (model_name, score[1]))
 
 
 def get_data(verbose=0):
@@ -157,3 +200,79 @@ def print_nn_layer_outputs():
 
 if __name__ == '__main__':
     main()
+
+
+
+# import keras
+# from keras.datasets import mnist
+# from keras.datasets import fashion_mnist
+# from keras.models import Sequential
+# from keras.layers import Dense, Dropout, Flatten
+# from keras.layers import Conv2D, MaxPooling2D
+# from keras import backend as K
+# import matplotlib.pyplot as plt
+# import numpy as np
+# import tensorflow as tf
+# from alk_lib import save_model
+
+# dataset = 'mnist'
+# model_name = '3_' + dataset + '_keras'
+
+# def get_data(verbose=0):
+#     # the data, shuffled and split between train and test sets
+#     if dataset == 'mnist':
+#         (x_train, y_train), (x_test, y_test) = mnist.load_data()
+#         img_rows, img_cols, num_classes = 28, 28, 10
+#     elif dataset == 'mnist_fashion':
+#         (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
+#         img_rows, img_cols, num_classes = 28, 28, 10
+#     else:
+#         print('Invalid dataset name')
+#         quit()
+    
+#     if K.image_data_format() == 'channels_first':
+#         x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
+#         x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
+#         input_shape = (1, img_rows, img_cols)
+#     else:
+#         x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
+#         x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+#         input_shape = (img_rows, img_cols, 1)
+    
+#     x_train = x_train.astype('float32')/255
+#     x_test = x_test.astype('float32')/255
+    
+#     if verbose:
+#         print('x_train shape:', x_train.shape)
+#         print(x_train.shape[0], 'train samples')
+#         print(x_test.shape[0], 'test samples')
+    
+#     # convert class vectors to binary class matrices
+#     y_train = keras.utils.to_categorical(y_train, num_classes)
+#     y_test = keras.utils.to_categorical(y_test, num_classes)
+    
+#     return (x_train, y_train), (x_test, y_test), input_shape, num_classes
+
+# (x_train, y_train), (x_test, y_test), input_shape, num_classes = get_data()
+
+
+# model = keras.models.load_model('3_mnist_keras/model_complete_with_dropout.h5')
+# score = model.evaluate(x_test, y_test, verbose=0)
+# print('Model with dropout: test accuracy:', score[1])
+
+# model = keras.models.load_model('3_mnist_keras/model_complete.h5')
+# score = model.evaluate(x_test, y_test, verbose=0)
+# print('Model without dropout: test accuracy:', score[1])
+
+# model = Sequential()
+# model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
+# model.add(Conv2D(64, (3, 3), activation='relu'))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Flatten())
+# model.add(Dense(128, activation='relu'))
+# model.add(Dense(num_classes, activation='softmax'))
+
+# model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adadelta(), metrics=['accuracy'])
+# model.load_weights("3_mnist_keras/model_weights.h5")
+# score = model.evaluate(x_test, y_test, verbose=0)
+# print('Model without dropout: test accuracy:', score[1])

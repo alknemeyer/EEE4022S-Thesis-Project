@@ -6,7 +6,7 @@ In wpa_supplicant.conf, change the contents to the lines between the %%:
 
 %%
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
+update_config=1S
 country=ZA
 
 network={

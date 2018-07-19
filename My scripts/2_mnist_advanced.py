@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 def main():
     x, y_conv, keep_prob = create_dnn()
-    train_dnn(x, y_conv, keep_prob, num_steps=1000,
+    train_dnn(x, y_conv, keep_prob, num_steps=300,
               save_model=True, plot_accuracy=True)
 
 
@@ -30,7 +30,6 @@ def create_dnn(width=28, height=28):
     x_image = tf.reshape(x, [-1, width, height, 1], name='x_image')
 
     # FIRST LAYER - convolution + max pooling
-
     # 5 x 5     patch size
     # 1         number of input channels
     # 32        number of output channels
@@ -45,6 +44,7 @@ def create_dnn(width=28, height=28):
 
     # SECOND LAYER
     # maps 32 feature maps to 64 features for each 5x5 patch
+    # 5x5 patch size, 32 inputs, 64 outputs
     W_conv2 = weight_variable([5, 5, 32, 64])
     b_conv2 = bias_variable([64])
 
@@ -52,13 +52,15 @@ def create_dnn(width=28, height=28):
     h_pool2 = max_pool_2x2(h_conv2)
 
     # densely connected layer
-    # Now that the image size has been reduced to 7x7, we add a
+    # Now that the image size has been reduced to 7x7 ((14x14)/2), we add a
     # fully-connected layer with 1024 neurons to allow processing on the
     # entire image. We reshape the tensor from the pooling layer into a batch
     # of vectors, multiply by a weight matrix, add a bias, and apply a ReLU
+    # number of inputs = 7x7x64, number of outputs = 1024
     W_fc1 = weight_variable([7 * 7 * 64, 1024])
     b_fc1 = bias_variable([1024])
 
+    # regular fully connected layer (not a convolution one)
     h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
@@ -80,7 +82,7 @@ def create_dnn(width=28, height=28):
     return (x, y_conv, keep_prob)
 
 
-def train_dnn(x, y_conv, keep_prob, num_steps=20000,
+def train_dnn(x, y_conv, keep_prob, num_steps=20_000,
               save_model=False, plot_accuracy=False):
     # load MNIST data
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -124,7 +126,7 @@ def train_dnn(x, y_conv, keep_prob, num_steps=20000,
 
         if plot_accuracy is True:
             # plot the accuracy over time
-            plt.plot(accuracy_history)
+            plt.plot(accuracy_history*100)
             plt.show()
 
         if save_model is True:

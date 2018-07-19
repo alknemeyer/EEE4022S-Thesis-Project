@@ -1,10 +1,12 @@
 """ functions to help with quick debugging, visualistion, etc """
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 from keras.datasets import mnist, fashion_mnist
 from keras import backend as K
 from keras.utils import to_categorical
+import tensorflow as tf
 
 
 def plot_imag(pixels, label=None, width=28, height=28, plot_hist=False):
@@ -75,13 +77,78 @@ def binary_loss(y_true, y_pred):
     return -np.mean(y_true*np.log(y_pred) + (1 - y_true)*np.log(1 - y_pred))
 
 
-def resave_as_tensorflow():
-    print('"resave_as_tensorflow()" not implemented yet')
+def resave_as_pb(session, keep_var_names=None,
+                 output_names=None, clear_devices=True):
+    """
+    Freezes the state of a session into a pruned computation graph.
 
-    # load model
-    # K.set_learning_phase(0)
-    # model = keras.models.load_model(model_name)
+    Creates a new computation graph where variable nodes are replaced by
+    constants taking their current value in the session. The new graph will be
+    pruned so subgraphs that are not necessary to compute the requested
+    outputs are removed.
+    @param session The TensorFlow session to be frozen.
+    @param keep_var_names A list of variable names that should not be frozen,
+                          or None to freeze all the variables in the graph.
+    @param output_names Names of the relevant graph outputs.
+    @param clear_devices Remove the device directives from the graph for better portability.
+    @return The frozen graph definition.
+    """
+    import tensorflow as tf
+    from tensorflow.python.framework.graph_util import convert_variables_to_constants
+    graph = session.graph
+    with graph.as_default():
+        freeze_var_names = list(set(v.op.name for v in tf.global_variables()).difference(keep_var_names or []))
+        output_names = output_names or []
+        output_names += [v.op.name for v in tf.global_variables()]
+        input_graph_def = graph.as_graph_def()
+        if clear_devices:
+            for node in input_graph_def.node:
+                node.device = ""
+        frozen_graph = convert_variables_to_constants(session, input_graph_def,
+                                                      output_names, freeze_var_names)
+        return frozen_graph
 
+
+def save_model(model, dir_name):
+    print(model.input)
+    print(model.output)
+
+    K.set_learning_phase(0)
+
+    model.save(dir_name + '/model_complete.h5')
+
+    frozen_graph = resave_as_pb(
+        K.get_session(),
+        output_names=[out.op.name for out in model.outputs])
+    tf.train.write_graph(frozen_graph, dir_name,
+                         'model_pb.pb', as_text=False)
+
+    model_json = model.to_json()
+    with open(dir_name + '/model_arch.json', 'w') as json_file:
+        json_file.write(model_json)
+
+
+def export_mvnc_graph(model, dir_name):
+    # https://movidius.github.io/ncsdk/tools/compile.html
+
+    frozen_graph = resave_as_pb(
+        K.get_session(),
+        output_names=[out.op.name for out in model.outputs])
+
+    tf.train.write_graph(frozen_graph, dir_name,
+                         'model_pb.pb', as_text=False)
+
+    input_name = model.inputs[0].op.name
+    output_name = model.outputs[0].op.name
+
+    print('\n\nmvNCCompile model_pb.pb\
+           -in=conv2d_3_input -on=dense_4/Softmax -s 12')
+
+    command = 'mvNCCompile %s -in %s -on %s -o=%s'\
+              % (dir_name + 'model_pb.pb', input_name, output_name, dir_name)
+
+    print('Running the following command:\n%s' % command)
+    os.system(command)
 
 if __name__ == '__main__':
     pass
