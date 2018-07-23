@@ -1,0 +1,10 @@
+to do:
+
+1. go through fast ai course, revise everything and try rebuild stuff in keras
+2. read paper on dropout
+3. get keras visualisation working? https://keras.io/visualization/
+
+
+
+keep in mind:
+1. https://movidius.github.io/ncsdk/tf_compile_guidance.html

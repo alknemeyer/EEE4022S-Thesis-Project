@@ -51,7 +51,7 @@ def keras_to_graph(model_path, model_in, model_out, weights_path, graph_path, ta
 
     tf_to_graph(tf_model_path, model_in, model_out, graph_path)
 
-    if take_tf_files == False:
+    if take_tf_files is False:
         os.system('rm -rf ./TF_Model')
 
 
