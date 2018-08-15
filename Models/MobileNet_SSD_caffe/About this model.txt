@@ -1,0 +1,12 @@
+Example here (look in both branches):
+    https://github.com/movidius/ncappzoo/tree/master/caffe/SSD_MobileNet
+    https://github.com/movidius/ncappzoo/tree/ncsdk2/caffe/SSD_MobileNet
+See run.py for more info on model specifics
+
+Model comes from this repo:
+    https://github.com/chuanqi305/MobileNet-SSD
+
+Some notes:
+    input dimensions: (300, 300)
+    training sources: MS-COCO, fine-tuned on VOC0712
+    see the original repo + MobileNetSSD_deploy.prototxt for more info
