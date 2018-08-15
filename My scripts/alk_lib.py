@@ -100,7 +100,7 @@ def resave_as_pb(session, keep_var_names=None,
 
     graph = session.graph
     with graph.as_default():
-        freeze_var_names = list(set(v.op.namefor v in tf.global_variables())
+        freeze_var_names = list(set(v.op.name for v in tf.global_variables())
                                 .difference(keep_var_names or []))
         output_names = output_names or []
         output_names += [v.op.name for v in tf.global_variables()]
@@ -147,8 +147,8 @@ def export_mvnc_graph(model, dir_name):
     input_name = model.inputs[0].op.name
     output_name = model.outputs[0].op.name
 
-    print('\n\nmvNCCompile model_pb.pb\
-           -in=conv2d_3_input -on=dense_4/Softmax -s 12')
+#    print('\n\nmvNCCompile model_pb.pb\
+#           -in=conv2d_3_input -on=dense_4/Softmax -s 12')
 
     command = 'mvNCCompile %s -in %s -on %s -o=%s'\
               % (dir_name + 'model_pb.pb', input_name, output_name, dir_name)

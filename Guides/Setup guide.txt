@@ -47,14 +47,18 @@ At this point you might find it preferable to ssh into the pi from your laptop, 
 5.3	`pip3 install numpy`
 
 # install movidius in api only mode
-6.1	sudo apt-get install libusb-1.0-0-dev
-6.2 `mkdir -p ~/workspace && cd ~/workspace && git clone -b ncsdk2 https://github.com/movidius/ncsdk.git && cd ~/workspace/ncsdk/api/src && make && sudo make install`
-6.3 download and test examples: `git clone -b ncsdk2 https://github.com/movidius/ncappzoo.git && cd ncappzoo/apps/hello_ncs_py && python3 hello_ncs.py`
+6.1	sudo apt install libusb-1.0-0-dev
+6.2 install ncs api: `mkdir -p ~/workspace && cd ~/workspace && git clone -b ncsdk2 https://github.com/movidius/ncsdk.git && cd ~/workspace/ncsdk/api/src && make && sudo make install`
+6.3 download and test examples: `cd ~/workspace && git clone -b ncsdk2 https://github.com/movidius/ncappzoo.git && cd ncappzoo/apps/hello_ncs_py && python3 hello_ncs.py`
 
 
 
+libjasper1 libatlas-base-dev
 # installing opencv
-1	sudo apt install libatlas-base-dev
+1	sudo apt install libatlas-base-dev libjasper1 libqtgui4 libqt4-test
+2	pip3 install scikit-image scipy
+
+
 2	follow instructions at: https://github.com/webmproject/libwebp
 3	sudo ln -s /usr/local/lib/libwebp.so.7 /usr/lib/libwebp.so.6 (.7 exists, .6 doesn't)
 4	sudo apt-get install libtiff5 libjasper1 libilmbase12 openexr libgstreamer1.0-0
@@ -148,3 +152,7 @@ Example scripts for NCS:
 	https://github.com/movidius/ncappzoo/tree/ncsdk2/apps
 Install MVNC in API-only mode:
 	https://movidius.github.io/blog/ncs-apps-on-rpi/
+
+
+### mobilenetv2
+http://machinethink.net/blog/mobilenet-v2/

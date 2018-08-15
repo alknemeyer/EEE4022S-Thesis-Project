@@ -42,10 +42,9 @@ class Window(Frame):
 
         self.index = 0
 
-        self.img_width = -1
-        self.img_height = -1
+        self.first_xy_added = False
 
-        print('\nx\ty\timg')
+        print('\nx\ty\twidth\theight\timg')
         print('------------------------')
 
         self.init_window()  # run init_window, which doesn't yet exist
@@ -71,17 +70,30 @@ class Window(Frame):
         # scale to be out of 100
         x = int(event.x * 100./self.img_width)
         y = int(event.y * 100./self.img_height)
-        add_to_file(self.dirs[self.index-1], 1, x, y)
-        print('%i\t%i\t%s' % (event.x, event.y, self.dirs[self.index-1], ))
 
-        if self.index >= len(self.dirs):
-            exit()
+        if self.first_xy_added:
+            width = x - self.first_x
+            height = y - self.first_y
+            add_to_file(self.dirs[self.index-1], 1,
+                        self.first_x, self.first_y, width, height)
 
-        self.load_new_image()
+            print('%i\t%i\t%i\t%i\t%s'
+                  % (self.first_x, self.first_y,
+                     width, height, self.dirs[self.index-1]))
+
+            if self.index >= len(self.dirs):
+                exit()
+
+            self.load_new_image()
+
+        else:
+            self.first_x = x
+            self.first_y = y
+            self.first_xy_added = True
 
     def add_without_coords(self, event):
-        add_to_file(self.dirs[self.index-1], 0, -1, -1)
-        print('%s:\tNo object' % self.dirs[self.index-1])
+        add_to_file(self.dirs[self.index-1], 0, -1, -1, -1, -1)
+        print('No object:\t%s' % self.dirs[self.index-1])
 
         if self.index >= len(self.dirs):
             exit()
@@ -113,6 +125,8 @@ class Window(Frame):
         img.image = render
         img.place(x=0, y=0)
 
+        self.first_xy_added = False
+
 
 def create_initial_file(OUTFILE_NAME):
     """ ugly way of avoiding overwriting an existing file """
@@ -137,17 +151,15 @@ def add_to_file(img_path, contains_obj, x, y, width, height):
     with open(OUTFILE_NAME, 'a') as f:
         f.write('%s,%i,%i,%i,%i,%i\n'
                 % (img_path, contains_obj, x, y, width, height))
+        # f.write('img,' + ','.join(lst) + '\n')
         f.close()
 
 
 if __name__ == '__main__':
-    t = time()
-
     root = Tk()  # root window
 
     if IMAGE_FOLDER is '':
         IMAGE_FOLDER = askdirectory(parent=root,
-                                    initialdir="/",
                                     title='Please select a directory')
 
     OUTFILE_NAME = create_initial_file(OUTFILE_NAME)

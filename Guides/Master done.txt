@@ -126,3 +126,9 @@ To read:
 	https://medium.com/ilenze-com/object-detection-using-deep-learning-for-advanced-users-part-1-183bbbb08b19
 	http://forums.fast.ai/t/classifying-multiple-objects-in-single-image/3684/5
 	https://github.com/endernewton/tf-faster-rcnn
+
+
+
+
+### Datasets:
+	https://storage.googleapis.com/openimages/web/download.html

@@ -8,3 +8,25 @@ to do:
 
 keep in mind:
 1. https://movidius.github.io/ncsdk/tf_compile_guidance.html
+
+
+options for localisation:
+1.  idea:
+        return (confidence, x, y) as outputs of network
+    pros:
+        probably most efficient
+        simplest
+        highest resolution
+    issues: 
+        what happens when there are multiple objects?
+
+2.  idea:
+        run classification network multiple times over portions of the image
+    pros:
+        could run in parallel on NCS
+        solves multiple objects problem
+        might be all the resolution I need
+    issues:
+        complex
+        probably more compute intensive 
+

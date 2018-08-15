@@ -3,6 +3,7 @@
 *.ini
 *.exe
 *.PNG
+*.jpg
 *.gz
 *.index
 *.meta
@@ -12,11 +13,8 @@
 *.gif
 RPI setup/FileZillaPortable
 *.lnk
-My scripts/MNIST_data
-fast ai/fastai
 *.data*
 *.pdf
-
 
 
 # Byte-compiled / optimized / DLL files
