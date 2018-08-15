@@ -15,6 +15,7 @@ RPI setup/FileZillaPortable
 *.lnk
 *.data*
 *.pdf
+*.code-workspace
 
 
 # Byte-compiled / optimized / DLL files
