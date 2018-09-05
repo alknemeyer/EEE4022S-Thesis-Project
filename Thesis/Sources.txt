@@ -1,0 +1,19 @@
+To read:
+
+https://blog.athelas.com/a-brief-history-of-cnns-in-image-segmentation-from-r-cnn-to-mask-r-cnn-34ea83205de4
+
+https://adeshpande3.github.io/adeshpande3.github.io/A-Beginner's-Guide-To-Understanding-Convolutional-Neural-Networks/
+
+https://adeshpande3.github.io/adeshpande3.github.io/A-Beginner's-Guide-To-Understanding-Convolutional-Neural-Networks-Part-2/
+
+https://adeshpande3.github.io/The-9-Deep-Learning-Papers-You-Need-To-Know-About.html
+
+https://lilianweng.github.io/lil-log/2017/12/31/object-recognition-for-dummies-part-3.html
+
+https://medium.com/@dhruvp/how-to-write-a-neural-network-to-play-pong-from-scratch-956b57d4f6e0
+
+https://www.pyimagesearch.com/2018/07/30/opencv-object-tracking/
+
+
+Read already:
+

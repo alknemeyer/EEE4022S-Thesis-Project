@@ -1,0 +1,113 @@
+\documentclass{article}
+
+\usepackage{graphicx}
+% Matthew Gadd
+% Callen (ugrad and msc)
+% Justin Coetser
+
+% ----------------------------------------------------------------
+\begin{document}
+\title{Alex Thesis Project}
+\author{Alexander Knemeyer}
+
+\maketitle
+\section{Terms of Reference}
+
+\section{Acknowledgement}
+thanks Callen and Amir\\
+thanks Justin Pead\\
+thanks Stacey for laser cutting\\
+thanks family and friends
+
+\begin{abstract}
+Test abstract!
+\end{abstract}
+
+\section{List of Figures}
+
+\section{List of Tables}
+
+\section{Introduction}
+\subsection{Background to the study}
+\subsection{Objectives of the study}
+\subsection{Scope and limitations}
+\subsection{Plan of development}
+\subsection{Report outline}
+
+\section{Literature Review}
+\subsection{Importance and applications of ...}
+\subsection{Academic works related to ...}
+
+\section{Research Design and Timeline}
+\subsection{Research Problem}
+narrow angle gopro with computer vision better than multiple wide angled gopros??
+\subsection{Elaboration of the Plan of Action}
+Do the minimum complete system first, then work on any extras, even if they're core to the idea of the project
+
+Decided that training on cheetahs isn't core
+
+\subsection{Description of activies, methods and software platforms}
+\subsection{... validation}
+\subsection{Project Timeline}
+
+\section{System modelling and design}
+
+\subsection{Object detection}
+\subsubsection{Intro to neural networks}
+why nn instead of other cv techniques? ans: can in princple make this neural net track ANY object with high accuracy, with no extra difficult design work (just open datasets or a couple hundred hand labelled images)
+
+Explain concept of 'learning', image classification vs object detection
+
+CNN, transfer learning, pace of advancements is quick
+
+How modern data science works (difference between data scientist, who designs the neural network architecture, and machine learning engineer, who tends to take existing designs, possibly modify them, and then put them into production
+
+\subsubsection{Movidius Neural Compute stick}
+required to get classification speed from $\approx 1 Hz$ to $\approx 10 Hz$
+
+Had great difficulties. Limited choice of nn framework (tensorflow object detection isn't supported) and neural network architectures
+
+\subsubsection{Comparison of neural network architectures}
+Why I chose MobileNet (designed for applications such as mine) (can afford the accuracy loss)\\
+Why I chose SSD (instead of sliding window) $\rightarrow$ inference time
+
+\subsection{Gimbal}
+\subsubsection{Comparison of actuator types}
+
+\subsubsection{Gimbal design inspirations}
+The primbal from thingieverse
+
+Sylv's mount
+
+Some changes to make it work for my application
+
+\subsection{Extended Kalman Filter}
+
+\subsection{Controller design and implementation}
+
+\section{System Integration and Testing}
+
+\section{Results}
+DONT DISCUSS THE RESULTS, JUST SHOW THEM!
+
+\section{Discussion}
+THIS IS WHERE THE RESULTS ARE DISCUSSED
+
+\section{Conclusions}
+test text
+
+\section{Recommendations and Future Work}
+Talk about: \\
+- do other objects/animals \\
+- predict distance with nn afterwards (using gopro footage)
+
+\section{References}
+
+\appendix
+\section{Additional Files and etc etc}
+
+\section{Addenda}
+\subsection{Ethics Forms}
+
+% ----------------------------------------------------------------
+\end{document}
