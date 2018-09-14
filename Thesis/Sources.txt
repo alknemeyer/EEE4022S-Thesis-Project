@@ -14,6 +14,8 @@ https://medium.com/@dhruvp/how-to-write-a-neural-network-to-play-pong-from-scrat
 
 https://www.pyimagesearch.com/2018/07/30/opencv-object-tracking/
 
+http://lamda.nju.edu.cn/weixs/project/CNNTricks/CNNTricks.html
+
 
 Read already:
 
