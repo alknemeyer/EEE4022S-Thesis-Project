@@ -16,6 +16,8 @@ https://www.pyimagesearch.com/2018/07/30/opencv-object-tracking/
 
 http://lamda.nju.edu.cn/weixs/project/CNNTricks/CNNTricks.html
 
+http://timdettmers.com/2018/08/21/which-gpu-for-deep-learning/
+
 
 Read already:
 
