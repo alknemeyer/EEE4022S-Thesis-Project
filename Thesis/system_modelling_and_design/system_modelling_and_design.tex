@@ -1,8 +1,20 @@
 \section{System modelling and design}
 
 \subsection{Object detection}
+It was required that the system detect the position of an object from a photo. In particular, the object detector should,
+
+\begin{itemize}
+	\item not require a beacon or light to be placed on the object,
+	\item run at around 5 to 10 Hz,
+	\item make predictions with high accuracy,
+	\item work regardless of the orientation of the object, and
+	\item be able to track any object with minimal extra work/design required.
+\end{itemize}
+
+Convolutional Neural Networks (CNNs) can fill all these requirements. Other computer vision techniques (such as convolution with kernels to find certain techtures) generally run at higher speeds but are sorely lacking in terms of accuracy and robustness. Thinking and design work is required to make the object detector work with new types of objects, whereas CNNs simply require a few hundred or thousand labelled images and a few hours on a modern GPU. There are many open datasets which can be used to make this work easier.
+
 \subsubsection{Intro to neural networks}
-why nn instead of other cv techniques? ans: can in princple make this neural net track ANY object with high accuracy, with no extra difficult design work (just open datasets or a couple hundred hand labelled images)
+Machine learning, in which data is used to create a model which maps some input to an output, has recently seen a rapid increase in progress and popularity. Neural networks (a general structure for machine learning models) have played a large part in this sudden interest. The growth has been largely driven by Deep Neural Networks (DNNs) grown have come into the spotlight 
 
 Explain concept of 'learning', image classification vs object detection
 
@@ -11,34 +23,91 @@ CNN, transfer learning, pace of advancements is quick
 How modern data science works (difference between data scientist, who designs the neural network architecture, and machine learning engineer, who tends to take existing designs, possibly modify them, and then put them into production
 
 \subsubsection{Movidius Neural Compute stick}
-required to get classification speed from $\approx 1 Hz$ to $\approx 10 Hz$
+CNNs require a large number of operations to produce an output. The computation required depends on the neural network architecture, though even 'small' object detectors generally require at least two million Multiply-Accumulate instructions with significant amounts of data being loaded to and from the cache. Combined with the slower processor on the raspberry pi, the neural network would not be able to run in real time.
 
-Had great difficulties. Limited choice of nn framework (tensorflow object detection isn't supported) and neural network architectures
+% nn and params: https://mxnet.apache.org/api/python/gluon/model_zoo.html
+
+Luckily, this work can be parallelised. There are three types of parallelisation which tend to occur - during the application of $3 \times 3$ kernels, during matix multiplication and in parts of the neural network where the data flow is naturally parallel. This work is a natural fit for GPUs, though since GPU support for CNNs on the raspberry pi is lacking, other means had to be investigated.
+
+% https://petewarden.com/2014/08/07/how-to-optimize-raspberry-pi-code-using-its-gpu/
+% https://rpiplayground.wordpress.com/2014/05/03/hacking-the-gpu-for-fun-and-profit-pt-1/
+
+This brought us to the Movidius Neural Compute Stick (NCS) - a specialized neural network accelerator which plugs into the raspberry pi (or any other computer). The NCS requires extra power and space, but its 12 purpose-built processing cores typically result in inference speed increases of between $700\%$ and $100\%$. It also has the benefit of being purpose built for CNNs.
+
+% [ TODO: RESULTS: Had great difficulties. Limited choice of nn framework (tensorflow object detection isn't supported) and neural network architectures ]\\
+% [ TODO: RESULTS: WENT FROM $\approx 1 Hz$ to $\approx 10 Hz$ ]
 
 \subsubsection{Comparison of neural network architectures}
-Why I chose MobileNet (designed for applications such as mine) (can afford the accuracy loss)\\
-Why I chose SSD (instead of sliding window) $\rightarrow$ inference time
+Not all neural network architectures are equal - generally, differences between models include:
+
+\begin{itemize}
+	\item classification accuracy
+	\item inference speed, which is a function of the number of operations and number of weights
+	\item data required for training/fine tuning
+	\item the existence (or lack) of pretrained models in your specific framework
+	\item whether recent innovations in the field have been included, and
+	\item the underlying method in which objects are detected and localised within the image
+\end{itemize}
+
+Newer neural networks often take ideas from older architectures. Sometimes, they even include all or most of a previous architecture as part of the design of the new model. An example of this is MobileNet - an architecture designed at Google, aimed to run quickly on modern mobile devices (such as their newer smartphones). A common practice is to train MobileNet to classify objects on a given dataset, then remove the final layers, concatenate it with another model (with MobileNet acting as a feature extractor) and end up with an object detector.
+
+Since MobileNet was designed for mobile devices, it traded some classification accuracy for performance. However, the architecture is remarkable in that the performance is significant while the classification accuracy is not. Thus, it was chosen as the feature detector for the project.
+
+Next was the choice of the actual object detector. There are two (TODO: check this) main ideas for this approach: one could get an image classifier and apply it to the image multiple times (such as 25 times) resulting in a grid of overlapping detections.
+
+[ SHOW IMAGE ]
+
+Using the prediction probability for each part of the image, one can estimate where in the frame the desire object(s) is. This has the advantage of allowing for a simpler network architecture, but comes at the cost of performance (as the neural network must be applied multiple times) and resolution (determined by the grid size, which determines the run time). This is known as the 'sliding window' technique.
+
+The other approach uses the fact that the neural network can locate objects in the frame, and thus returns the locations of objects in the image embedded in the output nodes. An example of this type of network is the Single Shot Detector (SSD) which, as the name suggests, requires only a single inference to output a list of objects, their classification probabilities and their locations in the frame.
+
+[ TODO: RESULTS: talk about trying to make my own network with two output nodes, which simply predicts the centroid of the object as a scale from -1 to 1, with -1 being the bottom or left side of the image and 0 being the center. Couldn't get it to compile due to tensorflow support ]
+
+\subsubsection{Comparison of neural network frameworks}
+% speeds: https://arxiv.org/pdf/1608.07249v7.pdf
+Tensorflow - low level, annoying and hard to use, fast
+Keras - simple to use, tensorflow as backend so relatively fast, less fine grained control possible, can't find all the latest models there, can export model as tensorflow
+Caffe - fast, easy to use, hard to extend, only really for CNNs, might be dying out
+
+% ------------------------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------------------------
 
 \subsection{Gimbal}
-\subsubsection{Intro to gimbals + their purpose}
+Once an object has been found and a desired control action calculated, the camera must be moved. This required the use of a camera gimbal.
 
 \subsubsection{Comparison of actuator types}
-servos: easy to use, but shaky
+The type of actuator used in the gimbal has a significant effect on the design of the gimbal, the speed it can move, the camera weight it can handle and quality of the resulting photos and videos. Three main actuator types were considered and compared:
+
+DC motors: quite long and heavy, require encoders or IMU, potentiallty messy circuitry (for bidirectional), not extremely fast/efficient
+
+Servo motors: very easy to use (essentially a DC motor with circuitry built in), somewhat large, good torque, can work without encoders/IMU though not necessarily advised, get very jittery control
+
+Brushless DC (BLDC) motors: quite complex to use, somewhat expensive, very compact, very fast and give very smooth footage. Also, the gimbal controller (which is unfortunately a requirement) makes things easier and very professional. Requires either encoders or IMU
+
+Chose BLDC as the motors are small, and it has the highest capacity for "good" footage (silky smooth operation with fast responses)
 
 \subsubsection{Gimbal design inspirations}
-The primbal from thingieverse
+I began by looking for gimbal designs on free online repositories. Couldn't find one that suited my needs, so to avoid re-inventing the wheel I used the primbal from thingieverse as a base and took some inspiration from Sylv's mount (such as how to mount to the specific quad).
 
-Sylv's mount
-
-Some changes to make it work for my application
+Had to make some changes to make it work for my application
 
 \subsubsection{Gimbal controller}
 Tuned PID controller
 
+Rewrote SerialAPI in Python (took a while) (releasing for free online)
+
 \subsubsection{Gimbal motors}
 Can increase gopro spacing etc (motors are v v strong)
 
+% ------------------------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------------------------
 
 \subsection{Extended Kalman Filter}
+
+% ------------------------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------------------------
 
 \subsection{Controller design and implementation}
