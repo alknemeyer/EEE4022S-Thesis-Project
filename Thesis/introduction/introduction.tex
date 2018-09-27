@@ -1,10 +1,27 @@
 \section{Introduction}
 \subsection{Background to the study}
 
+Current situation: place multiple static pairs of gopros to film cheetahs to continuously film it as it runs around. Requires setup time + cost of cameras is expensive. In addition, to maximize film time, the gopro must be set to wide-angle which introduces distortions.
+
+
+
 \subsection{Objectives of the study}
+Design a system which can autonomously identify and track a fast-moving object using modern computer vision methods \\
+Want it to be cheaper, track the object for longer, and not require wide-angle cameras.
+
 
 \subsection{Scope and limitations}
+Not testing on actual cheetahs during project. \\
+Limited to one object in the frame at a time.
+
+
 
 \subsection{Plan of development}
+First get something basic that technically works: ie track humans using pieced together equipment, running on software that hasn't been optimized. \\
+Then, retrain nn to track cheetahs and show it can track a cheetah in a video. Also, optimize software to run at as high FPS as possible. Also handle cases where there's more than one object (either track one thing, or follow the biggest object?)
+
+
 
 \subsection{Report outline}
+
+
