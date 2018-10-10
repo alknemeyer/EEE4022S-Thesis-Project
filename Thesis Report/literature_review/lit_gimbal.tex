@@ -1,0 +1,26 @@
+\section{Gimbal}
+Once an object has been found and a desired control action calculated, the camera must be moved. This required the use of a camera gimbal.
+
+\subsection{Comparison of actuator types}
+The type of actuator used in the gimbal has a significant effect on the design of the gimbal, the speed it can move, the camera weight it can handle and quality of the resulting photos and videos. Three main actuator types were considered and compared:
+
+DC motors: quite long and heavy, require encoders or IMU, potentially messy circuitry (for bidirectional), not extremely fast/efficient
+
+Servo motors: very easy to use (essentially a DC motor with circuitry built in), somewhat large, good torque, can work without encoders/IMU though not necessarily advised, get very jittery control
+
+Brushless DC (BLDC) motors: quite complex to use, somewhat expensive, very compact, very fast and give very smooth footage. Also, the gimbal controller (which is unfortunately a requirement) makes things easier and very professional. Requires either encoders or IMU
+
+Chose BLDC as the motors are small, and it has the highest capacity for "good" footage (silky smooth operation with fast responses)
+
+\subsection{Gimbal design inspirations}
+I began by looking for gimbal designs on free online repositories. Couldn't find one that suited my needs, so to avoid re-inventing the wheel I used the primbal from thingieverse as a base and took some inspiration from Sylv's mount (such as how to mount to the specific quad).
+
+Had to make some changes to make it work for my application
+
+\subsection{Gimbal controller}
+Tuned PID controller
+
+Rewrote SerialAPI in Python (took a while) (releasing for free online)
+
+\subsection{Gimbal motors}
+Can increase gopro spacing etc (motors are v v strong)

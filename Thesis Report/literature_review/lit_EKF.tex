@@ -1,0 +1,30 @@
+\section{Extended Kalman Filter}
+
+% http://biorobotics.ri.cmu.edu/papers/sbp_papers/integrated3/kleeman_kalman_basics.pdf
+
+A Kalman Filter is an algorithm used to estimate the state of a system, along with the uncertainty of the estimate, based on (noisy) measurements over time. It makes use of a model of the system (representing how to get from state $x_{i-1}$ to state $x_i$) and measured 'disturbances' (things which affect the next state value, which aren't part of the current set of states).
+
+
+{\Large \color{red} TALK MORE ABOUT INTUTION}
+
+An Extended Kalman Filter (EKF) is simply the nonlinear version of a Kalman Filter. It works by using a Taylor approximation to linearize about an estimate of the current mean and covariance.
+
+Implementation-wise, the only difference between the linear and non-linear variants is that the state transition and observation models can be non-linear differentiable functions:
+
+$$ F \cdot x \rightarrow f(x) \qquad H\cdot x \rightarrow h(x) $$
+
+This is useful, because most real-life systems tend to not be linear. There are two states that an EKF can be in:
+
+In the predict stage, the current state estimate $\hat{x}_{k-1|k-1}$ is used to make an educated guess at the next state:
+
+$$ \hat{x}_{k|k-1} = f(\hat{x}_{k-1|k-1}, \hat{u}_k) $$
+
+where $\hat{u}_k$ represents the state disturbances. To keep track of the changing state uncertainties, the covariance matrix is updated as follows:
+
+$$ P_{k|k-1} = F_k P_{k-1|k-1} F_k^T + Q_k $$
+
+where $F_k$ is the jacobian of $f(\hat{x}_{k-1|k-1}, \hat{u}_k)$
+
+In the update stage, sensor values are added. First, the residual is calculated. It is the difference between what any sensors measure and what the states predict that the sensor will measure, and is calcualted as follows:
+
+\[ \hat{y}_k = z_k - h(\hat{x}_{k|k-1}) \]

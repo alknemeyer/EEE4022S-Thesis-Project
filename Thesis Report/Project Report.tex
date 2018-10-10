@@ -1,0 +1,156 @@
+\documentclass[a4paper,12pt]{report}
+
+\usepackage[top = 1in, bottom = 1in, left = 1in, right = 1in]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{lastpage}
+\usepackage{subfigure}
+\usepackage{lscape}
+\usepackage{hyphenat}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{xcolor}  % use to colour text
+
+\usepackage{listings}
+
+\usepackage{pythonhighlight}
+%\begin{python}
+%x = 1
+%\end{python}
+
+% page formatting
+\parskip = 6mm
+\parindent = 0mm
+\renewcommand{\headrulewidth}{0pt}
+\rhead[]{\thesection}
+\lhead[\thechapter]{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%\include{title_and_declaration}
+\thispagestyle{empty}
+{\Huge \begin{center}
+Autonomous Object Identification and Tracking % title
+\hrule
+{\Large ya boi} % subtitle
+\end{center}}
+
+\vskip 5mm
+\begin{center}
+\includegraphics[scale = 0.3]{uctLogo.png}
+\end{center}
+
+\vskip 5mm
+\begin{center}
+Presented by:\\
+Alexander Lutz Knemeyer
+\end{center}
+
+\vskip 10mm
+\begin{center}
+Prepared for:\\
+Callen Fisher \\
+Edward Boje \\
+Dept. of Electrical and Electronics Engineering\\University of Cape Town
+\end{center}
+
+\vskip 10mm
+\begin{center}
+Submitted to the Department of Electrical Engineering at the University of Cape Town in partial fulfilment of the academic requirements for a Bachelor of Science degree in Mechatronics Engineering
+\end{center}
+
+\vskip 5mm
+\begin{center}{\bf \today}
+\end{center}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+\onehalfspacing
+\nohyphens{
+\thispagestyle{empty}
+\vskip 40mm
+
+% Please leave the declaration as it is (Standard UCT declaration).
+{\Large Declaration} \\
+\hrule
+
+\vskip 10mm
+\begin{enumerate}
+\item I know that plagiarism is wrong. Plagiarism is to use another's work and pretend that it is one's own.
+\item I have used the IEEE convention for citation and referencing. Each contribution to, and quotation in, this report from the work(s) of other people has been attributed, and has been cited and referenced.
+\item This report is my own work.
+\item I have not allowed, and will not allow, anyone to copy my work with the intention of passing it off as their own work or part thereof.
+\end{enumerate}
+
+\vskip 10mm
+Signature: \ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots
+\\A. L. Knemeyer
+\vskip10mm
+Date: \ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots
+
+\fancyfoot[C]{\thepage}
+\pagestyle{plain}
+\newpage
+
+\pagenumbering{roman}
+{\Large Acknowledgements} \\
+\hrule
+
+thanks Callen and Amir \\
+thanks Sylv \\
+thanks Justin Pead \\
+thanks Stacey for laser cutting \\
+thanks family and friends
+
+\newpage
+
+\include{abstract}
+
+\tableofcontents
+
+\newpage
+\listoffigures
+
+\newpage
+\listoftables
+
+% Page formatting, to place section titles as headers of odd pages and Chapter titles as headers of even pages.
+\newpage
+\fancyhead[RE,LO]{}
+\fancyhead[LE]{\leftmark}
+\fancyhead[RO]{\rightmark}
+\pagestyle{fancy}
+
+\pagenumbering{arabic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{introduction}
+\include{literature_review/literature_review}
+\include{literature_review/lit_nn}
+\include{literature_review/lit_gimbal}
+\include{literature_review/lit_EKF}
+\include{literature_review/lit_controller}
+\include{research_design_and_timeline}
+%\include{Methodology}
+\include{methodology/meth_system}
+\include{methodology/meth_nn}
+\include{methodology/meth_gimbal}
+\include{methodology/meth_EKF}
+\include{methodology/meth_control}
+\include{results/results}
+\include{discussion}
+\include{conclusions}
+\include{recommendations}
+%\include{References}
+\appendix
+%\include{appendixa}
+%\include{appendixb}
+}
+\end{document}

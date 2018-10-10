@@ -1,0 +1,38 @@
+\chapter{EKF Modelling and Design}
+
+{\large \color{red} talk about WHY constant $a$}
+
+An EKF was used to estimate the global angular position, velocity and acceleration of the tracked object. This meant a selection of the state matrix $x$ as,
+
+$$ \underline{x} = \begin{bmatrix} \theta \\ \dot{\theta} \\ \ddot{\theta} \end{bmatrix} $$
+
+These states are related through integration, where $\theta = \int{\dot{\theta} dt} = \int{\int{\ddot{\theta} dt}dt}$. Using discrete integration, this becomes $\theta_k = \theta_{k-1} + \Delta T \dot{\theta}$. The prediction matrix was thus chosen as,
+
+$$ F = \begin{bmatrix} 1 & \Delta T & 0 \\
+                       0 & 1 & \Delta T \\
+					   0 & 0 & 1
+		\end{bmatrix} $$
+
+While python wasn't designed for purely numerical programming (such as matrix multiplication), when the correct packages are used it approaches C-level speeds. Numpy in particular provides bindings of C arrays resulting in incredible speedups over regular python arrays.
+
+Thus, a Kalman Filter and Extended Kalman Filter were implemented as python classes to wrap around numpy matrices. A snippet of this can be seen below.
+
+\begin{python}
+class KalmanFilter():
+    def __init__(self, Ts, Q, R, a=1):
+        self.Ts = Ts
+        self.x = np.matrix([[0],  # position
+                            [0],  # velocity
+                            [0]]) # acceleration
+        self.P = np.matrix(np.eye(3))
+        self.F = np.matrix([[1, Ts,  0],
+                            [0,  1, Ts],
+                            [0,  0,  a]])
+        self.Q = np.matrix([[Q*(Ts**2),    0, 0],
+                            [        0, Q*Ts, 0],
+                            [        0,    0, Q]])
+        self.R = R
+\end{python}
+
+{\Large \color{red} Q and R tuned by recording real data, then adjusting them until the simulations looked 'right'}
+

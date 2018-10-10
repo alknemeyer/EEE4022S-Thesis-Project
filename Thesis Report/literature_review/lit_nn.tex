@@ -1,0 +1,95 @@
+\section{Object detection}
+It was required that the system detect the position of an object from a photo. In particular, the object detector should,
+
+\begin{itemize}
+	\item not require a beacon or light to be placed on the object,
+	\item run at around 5 to 10 Hz,
+	\item locate the object with high accuracy,
+	\item work regardless of the orientation of the object, and
+	\item be able to track any object with minimal extra work/design required.
+\end{itemize}
+
+Traditional computer vision techniques tend to use a variety of filters. One filter may detect vertical lines, another detects circles, another detects dots. Carefully designing and combining these filters can ultimately result in the detection of an object. However, this method is incredibly time consuming and requires extensive domain-specific knowledge. Even after the work has been put in to locate one type of object in a frame, locating another may require the user to start from scratch.
+
+{\Large Show image here}
+\hrule
+
+However, there exist other methods of creating and combining these filters (or kernels, as they are known in computer vision jargon). Instead of hand-crafting each filter and deciding how they should be combined, one could instead use machine-learning techniques to create kernals with optimal values. This boils down to using data (known input-output pairs of an image of cheetah, and the label "cheetah") to optimize neural network.
+
+Convolution in CNN = more like multiple dot products between kernal and matrix.
+
+The standard method of doing this is through the use of Convolutional Neural Networks (CNNs), which can fill all the requirements detailed above. CCNs are initialized with random values in their kernals, and random weights which combine the outputs of their kernals. The method to get accurate weights is as follows:
+
+\begin{enumerate}
+\item initialize the CNN with random values in the kernals and weights between neurons
+\item pass an image through the CNN, and see the output
+\item take the error (the difference between the output and the correct answer) and propagate it back through the CNN, adjusting the weights slightly in such a way that that same input would produce the correct output
+\item do this for a large, diverse image dataset
+\end{enumerate}
+
+While it is possible that the CNN will act as a look-up table (mapping those specific inputs to their correct outputs, but giving the wrong result for any other dataset) it is hoped that the CNN will instead map any {\textit similar} input to a similar output. As an example, a correct training CNN will map any image which {\textit looks} like a cheetah (has the correct body structure, spots, ear location, etc) to an output which represents "cheetah".
+
+It should be noted that CNNs are nothing more than a clever function. The map a set of input numbers (pixel values) to one or more output numbers (which encode the meaning "cheetah" or "no cheetah"; or even the coordinates of a cheetah).
+
+CNNs simply require a few hundred or thousand labelled images and a few hours on a modern GPU. There are many open datasets which can be used to make this work easier.
+
+\subsection{Intro to neural networks}
+Machine learning, in which data is used to create a model which maps some input to an output, has recently seen a rapid increase in progress and popularity. Neural networks (a general structure for machine learning models) have played a large part in this sudden interest. The growth has been largely driven by Deep Neural Networks (DNNs) grown have come into the spotlight 
+
+Explain concept of 'learning', image classification vs object detection
+
+CNN, transfer learning, pace of advancements is quick
+
+How modern data science works (difference between data scientist, who designs the neural network architecture, and machine learning engineer, who tends to take existing designs, possibly modify them, and then put them into production
+
+\subsection{Movidius Neural Compute stick}
+CNNs require a large number of operations to produce an output. The computation required depends on the neural network architecture, though even 'small' object detectors generally require millions of multiply-accumulate instructions with significant amounts of data being loaded to and from the various levels of cache. Combined with the slower processor on the raspberry pi, the neural network would not be able to run in real time. As an example, a cutting edge object detection network designed for use on mobile devices requires about 1 second to infer a result on the raspberry pi's CPU.
+
+% nn and params: https://mxnet.apache.org/api/python/gluon/model_zoo.html
+
+Luckily, this work can be easily parallelised over multiple processing cores. There are three types of parallelisation which tend to occur - during the application of kernels, during matix multiplication and in parts of the neural network where the data flow is naturally parallel. This work is a natural fit for GPUs, which contain a large number of processing cores design for such tasks. However, since GPU support for CNNs on the raspberry pi is lacking, other means had to be investigated.
+
+% https://petewarden.com/2014/08/07/how-to-optimize-raspberry-pi-code-using-its-gpu/
+% https://rpiplayground.wordpress.com/2014/05/03/hacking-the-gpu-for-fun-and-profit-pt-1/
+
+This brought us to the Movidius Neural Compute Stick (NCS) - a specialized neural network accelerator which plugs into the raspberry pi (or any other computer). The NCS requires extra power and space, but its 12 purpose-built processing cores typically result in inference speed increases of between $700\%$ and $1000\%$. It also has the benefit of being purpose built for CNNs.
+
+% [ TODO: RESULTS: Had great difficulties. Limited choice of nn framework (tensorflow object detection isn't supported) and neural network architectures ]\\
+% [ TODO: RESULTS: WENT FROM $\approx 1 Hz$ to $\approx 10 Hz$ ]
+
+\subsection{Comparison of neural network architectures}
+Not all neural network architectures are equal - generally, differences between models include:
+
+\begin{itemize}
+	\item classification accuracy,
+	\item inference speed, which is a function of
+	\begin{itemize}
+		\item the number of operations (processing) and
+		\item the number of weights (data retrieval)
+	\end{itemize}
+	\item the amount of data required for training/fine tuning,
+	\item the existence (or lack) of pretrained models in each specific deep learning framework,
+	\item whether recent innovations in the field have been included, and
+	\item the underlying method in which objects are detected and localised within the image
+\end{itemize}
+
+Newer neural networks often take ideas from older architectures. Sometimes, they even include all or most of a previous architecture as part of the design of the new model. An example of this is MobileNet - an architecture designed at Google, aimed to run quickly on modern mobile devices (such as their newer smartphones). A common practice is to train MobileNet to classify objects on a given dataset, then remove the final layers, concatenate it with another model (with MobileNet acting as a feature extractor) and end up with an object detector.
+
+Since MobileNet was designed for mobile devices, it traded some classification accuracy for performance. However, the architecture is remarkable in that the performance increase is significant while the classification accuracy decrease is not. Thus, it was chosen as the feature detector for the project.
+
+Next was the choice of the actual object detector. There are two (TODO: check this) main ideas for this approach: one could get an image classifier and apply it to the image multiple times (such as 25 times) resulting in a grid of overlapping detections.
+
+{\Large Show image here}
+\hrule
+
+Using the prediction probability for each part of the image, one can estimate where in the frame the desire object(s) is. This has the advantage of allowing for a simpler network architecture, but comes at the cost of performance (as the neural network must be applied multiple times) and resolution (determined by the grid size, which determines the run time). This is known as the 'sliding window' technique.
+
+The other approach uses the fact that the neural network can locate objects in the frame, and thus returns the locations of objects in the image embedded in the output nodes. An example of this type of network is the Single Shot Detector (SSD) which, as the name suggests, requires only a single inference to output a list of objects, their classification probabilities and their locations in the frame.
+
+[ TODO: RESULTS: talk about trying to make my own network with two output nodes, which simply predicts the centroid of the object as a scale from -1 to 1, with -1 being the bottom or left side of the image and 0 being the center. Couldn't get it to compile due to tensorflow support ]
+
+\subsection{Comparison of neural network frameworks}
+% speeds: https://arxiv.org/pdf/1608.07249v7.pdf
+Tensorflow - low level, annoying and hard to use, fast
+Keras - simple to use, tensorflow as backend so relatively fast, less fine grained control possible, can't find all the latest models there, can export model as tensorflow
+Caffe - fast, easy to use, hard to extend, only really for CNNs, might be dying out
