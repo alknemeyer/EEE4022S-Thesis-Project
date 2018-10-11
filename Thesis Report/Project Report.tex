@@ -5,19 +5,20 @@
 \usepackage{fancyhdr}
 \usepackage{amsmath, amsthm, amssymb}
 \usepackage{lastpage}
-\usepackage{subfigure}
+%\usepackage{subfigure}
 \usepackage{lscape}
 \usepackage{hyphenat}
 \usepackage{setspace}
-\usepackage{hyperref}
+\usepackage{hyperref}  % used for \href and urls in .bib
 \usepackage{xcolor}  % use to colour text
+\usepackage{subfig}  % putting packages side by side
 
-\usepackage{listings}
-
+%\usepackage{listings}
 \usepackage{pythonhighlight}
 %\begin{python}
 %x = 1
 %\end{python}
+%\pyth{__init}
 
 % page formatting
 \parskip = 6mm
@@ -30,7 +31,6 @@
 
 \begin{document}
 
-%\include{title_and_declaration}
 \thispagestyle{empty}
 {\Huge \begin{center}
 Autonomous Object Identification and Tracking % title
@@ -67,9 +67,10 @@ Submitted to the Department of Electrical Engineering at the University of Cape 
 \end{center}
 
 \newpage
-\thispagestyle{empty}
-\mbox{}
-\newpage
+
+%\thispagestyle{empty}  % leave a blank page
+%\mbox{}
+%\newpage
 
 \onehalfspacing
 \nohyphens{
@@ -152,5 +153,10 @@ thanks family and friends
 \appendix
 %\include{appendixa}
 %\include{appendixb}
+
+\bibliographystyle{plain}
+\bibliography{references}
+{\Large \color{red} find out how to include the url}
+
 }
 \end{document}

@@ -1,21 +1,52 @@
 \chapter{EKF Modelling and Design}
 
-{\large \color{red} talk about WHY constant $a$}
+\section{System modelling}
+An EKF was used to estimate the state of the tracked object as it moves around. Since the camera system generally rotates around an axis and there is no reliable estimate of the distance from the camera to the object being tracked, it was decided that the state would be measured in angular coordinates.
 
-An EKF was used to estimate the global angular position, velocity and acceleration of the tracked object. This meant a selection of the state matrix $x$ as,
+A model of the dynamics of the tracked object had to be chosen for the EKF to operate optimally. However, there is no possible "correct" model for the movements of the object being tracked (for example, a cheetah won't stick to the rule of moving at a constant velocity) and no way to estimate the disturbances $u$ which may effect its decision to change its velocity. Thus, it was decided that the model would make the incorrect assumption the the object would either maintain a constant velocity, constant acceleration of exponentially decaying acceleration. These three approaches needed to be tested, with the best being used in the final model.
 
-$$ \underline{x} = \begin{bmatrix} \theta \\ \dot{\theta} \\ \ddot{\theta} \end{bmatrix} $$
+This resulted in the global angular position, velocity and acceleration of the tracked object were estimated. These were stored in the state matrix $x$ as,
 
-These states are related through integration, where $\theta = \int{\dot{\theta} dt} = \int{\int{\ddot{\theta} dt}dt}$. Using discrete integration, this becomes $\theta_k = \theta_{k-1} + \Delta T \dot{\theta}$. The prediction matrix was thus chosen as,
+\[ \underline{x} = \begin{bmatrix} \theta \\ \dot{\theta} \\ \ddot{\theta} \end{bmatrix} \]
 
-$$ F = \begin{bmatrix} 1 & \Delta T & 0 \\
+These states are related through integration, where $\theta = \int{\dot{\theta} dt} = \int{\int{\ddot{\theta} dt}dt}$. The can be approximated using the discrete integration formulae, $\dot{\theta}_k = \dot{\theta}_{k-1} + \Delta T \ddot{\theta}_{k-1}$ and $\theta_k = \theta_{k-1} + \Delta T \dot{\theta}_{k-1}$. The prediction matrix was thus chosen as,
+
+\[ F = \begin{bmatrix} 1 & \Delta T & 0 \\
                        0 & 1 & \Delta T \\
-					   0 & 0 & 1
-		\end{bmatrix} $$
+					   0 & 0 & \beta
+		\end{bmatrix} \]
 
-While python wasn't designed for purely numerical programming (such as matrix multiplication), when the correct packages are used it approaches C-level speeds. Numpy in particular provides bindings of C arrays resulting in incredible speedups over regular python arrays.
+where $\beta$ is a factor which could be $\beta = 1$ for constant acceleration ($a_i = a_{i-1}$ in the predict stage), $0 < \beta < 1$ for decaying accelerating (for example, $a_i = 0.9 a_{i-1}$) or $\beta = 0$ for no acceleration. This was done to ensure quick and easy prototyping.
 
-Thus, a Kalman Filter and Extended Kalman Filter were implemented as python classes to wrap around numpy matrices. A snippet of this can be seen below.
+Next, the sensor needed to be added. The neural network returns the coordinates of the position of the object, measured in pixels. For the sake of modularity and simpler math, the pixel range of \pyth{pixel} $\in$ \pyth{[0, 299]} along a single axis was normalized to a value \pyth{pixel_norm} $\in$ \pyth{[-1, 1]}, with a pixel value of zero corresponding to the centre of the image. An illustration of this is shown below, in Figure~\ref{fig:pixel_to_angle}.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{methodology/pixel_to_angle2}
+  \caption{\label{fig:pixel_to_angle} Diagram showing the mapping from normalized pixel to angle.}
+\end{figure}
+
+Note that the pixel coordinate of the detected object is given by \pyth{x}, the angle to the object is \pyth{phi} ($\phi$) and the field of view of the camera is \pyth{theta} ($\theta$). Letting the distance between the camera and the plane at the closest point be noted as $L$, one can convert between pixel and angle as follows:
+
+\[ L = \frac{1}{\tan{\theta/2}} = \frac{x}{\tan{\phi}} \]
+Resulting in,
+\[ \phi = \tan^{-1}{\left( \frac{\tan{ \theta/2 }}{x} \right) }
+\qquad or
+\qquad x = \frac{\tan{\phi}}{\tan{\theta/2}} \]
+
+Thus, the mapping from pixel to angle is nonlinear. This is why an EKF was chosen instead of a linear Kalman Filter - a one pixel error in the middle of the image will propagate to a different angular error than a one pixel error at the edge. The Jacobian could then be calculated as,
+
+\[ \frac{\delta h}{\delta x} = \frac{\delta}{\delta x} \left[ \frac{\tan{\phi}}{\tan{\theta/2}} \right] = \frac{1 + \tan{(\phi)}^2}{\tan{\theta/2}} \]
+
+Finally, the $Q$ and $R$ matrices needed to be determined. In most systems, these can be calculated after careful modelling of the objects dynamics and consultation with component datasheets. However, in this system, the $Q$ matrix determined for an object which is close to the camera would be wildly inaccurate when the object is farther away, since distance affects the perceived angular movement of an object moving in a straight line. Since there is no distance estimate, this could not be reliably factored into a constantly changing $Q$. In addition, the neural network has no obvious value to use for the sensor noise, $R$.
+
+Thus, it was decided that these would be left as parameters to be tuned using recorded data.
+
+\section{Implementation of the EKF}
+
+While python wasn't designed for purely numerical programming (such as matrix multiplication), when the correct packages are used it can approach C-level speeds. \pyth{numpy} is one such package - it provides python bindings to C arrays, resulting in incredible speedups over regular python arrays.
+
+Thus, the Kalman Filter and Extended Kalman Filter were implemented as python classes which contain \pyth{numpy} matrices. A snippet of this can be seen below. \\
 
 \begin{python}
 class KalmanFilter():
@@ -33,6 +64,8 @@ class KalmanFilter():
                             [        0,    0, Q]])
         self.R = R
 \end{python}
+
+\section{Tuning the process noise and sensor uncertainty}
 
 {\Large \color{red} Q and R tuned by recording real data, then adjusting them until the simulations looked 'right'}
 
