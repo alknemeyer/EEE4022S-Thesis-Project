@@ -2,11 +2,11 @@
 It was required that the system detect the position of an object from a photo. In particular, the object detector should,
 
 \begin{itemize}
-	\item not require a beacon or light to be placed on the object,
-	\item run at around 5 to 10 Hz,
-	\item locate the object with high accuracy,
-	\item work regardless of the orientation of the object, and
-	\item be able to track any object with minimal extra work/design required.
+	\item Not require a beacon or light to be placed on the object,
+	\item Run at around 5 to 10 Hz,
+	\item Locate the object with high accuracy,
+	\item Work regardless of the orientation of the object, and
+	\item Be able to track any object with minimal extra work/design required.
 \end{itemize}
 
 This chapter details the literature sounding methods which could potentially achieve these requirements.
@@ -27,18 +27,20 @@ As an example, plotted below is an image before (left) and after (right) being c
 
 Note how the the vertical line in left part of the input has been found (represented by bright pixels in the output image). The horizontal line on the bottom right has been rejected. The faint vertical line in the top right has been found, albeit faintly. The exact same transformation is shown below, where the leftmost matrix is the input, the middle is the kernel and the rightmost matrix is the output.
 
+
+
 \begin{table}[h!]
 	\centering
 	\begin{tabular}{ p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm} p{0.5cm}}
-		 5 & 232 & 180 & 212 & 180 &           &    &   &    &   & 0 & 255 & 0 & 200 & 0 \\
-		30 & 243 & 152 & 206 & 188 &           & -1 & 2 & -1 &   & 0 & 255 & 0 & 116 & 0 \\
-		32 & 255 & 210 & 190 & 190 & $\otimes$ & -1 & 2 & -1 & = & 0 & 255 & 67 & 0  & 0 \\
-		11 & 242 & 235 & 230 & 210 &           & -1 & 2 & -1 &   & 0 & 255 & 0 &  0  & 0 \\
-		90 & 240 & 130 &  20 &  30 &           &    &   &    &   & 0 & 255 & 0 &  0  & 0
+ 5 & 232 & 180 & 212 & 180 &           &    &   &    &   & 0 & 255 & 0 & 200 & 0 \\
+30 & 243 & 152 & 206 & 188 &           & -1 & 2 & -1 &   & 0 & 255 & 0 & 116 & 0 \\
+32 & 255 & 210 & 190 & 190 & $\otimes$ & -1 & 2 & -1 & = & 0 & 255 & 67 & 0  & 0 \\
+11 & 242 & 235 & 230 & 210 &           & -1 & 2 & -1 &   & 0 & 255 & 0 &  0  & 0 \\
+90 & 240 & 130 &  20 &  30 &           &    &   &    &   & 0 & 255 & 0 &  0  & 0
 	\end{tabular}
 \end{table}
 
-A larger, more interesting input image is shown below, in Figure~\ref{fig:image_kernel_demo}.
+A larger, more interesting input image is shown below, in Figure~\ref{fig:image_kernel_demo}. The output image on the right hand side is the result of applying an edge-emphasizing filter. Note how the shape of the face and nose are highlighted.
 
 \begin{figure}[h!]
   \centering
@@ -78,7 +80,7 @@ Since the project at hand doesn't necessitate a brand new architecture, only a h
 
 \textit{Machine learning, neural networks, deep learning, CNNs}: machine learning is the branch of computer science involved in fitting a model using data alone. Neural networks are a subset of machine learning, specifying a class of architectures loosely inspired by the synapses in the nervous system of an organic brain. Deep learning is the relatively recent practice of creating especially long neural networks in order to represent more complex mappings. Finally, CNNs are a subset of deep learning, in which the synapses of a deep neural network are kernels which perform convolution operations.
 
-\textit{Image classification vs object detection:} an image classifier indicates \emph{what} object(s) are in an image. An object detector finds what objects are in the image, and also \emph{where} in the image they can be found.
+\textit{Image classification vs object detection:} an image classifier indicates \emph{what} object(s) are in an image. An object detector finds what objects are in the image, and also \emph{where} in the image they can be found. One might think to perform object detection using an image classification CNN by sliding the network over various overlapping parts of the input image, taking note of what part of the image the network is looking at when it finds an object - interestingly, this is almost exactly what object detectors do internally. In fact, it's exactly what convolution with a kernel does.
 
 \textit{Bounding box: (or 'anchor'):} a pair of points which determine a box around a detected object.
 
@@ -117,7 +119,6 @@ The actual processing is done using Intel's Myriad 2 Vision Processing Unit (VPU
 %\end{figure}
 
 
-
 \subsection{Comparison of neural network architectures}
 Not all neural network architectures are equal - generally, differences between models include,
 
@@ -134,24 +135,12 @@ Not all neural network architectures are equal - generally, differences between 
 	\item The underlying method in which objects are detected and localised within the image
 \end{itemize}
 
+{\Large \color{red} COMPARE THIS STUFF!!! }
 
-Newer neural networks often take ideas from older architectures. Sometimes, they even include all or most of a previous architecture as part of the design of the new model. An example of this is MobileNet - an architecture designed at Google, aimed to run quickly on modern mobile devices (such as their newer smartphones). A common practice is to train MobileNet to classify objects on a given dataset, then remove the final layers, concatenate it with another model (with MobileNet acting as a feature extractor) and end up with an object detector.
+{\Large \color{red} MAYBE JUST LOOK AT THE AVAILABLE NETWORKS IN THE MOVIDIUS THING?}
 
-Since MobileNet was designed for mobile devices, it traded some classification accuracy for performance. However, the architecture is remarkable in that the performance increase is significant while the classification accuracy decrease is not. Thus, it was chosen as the feature detector for the project.
+Newer neural networks often take ideas from older architectures. Sometimes, they even include all or most of a previous architecture as part of the design of the new model. An example of this is MobileNet - an architecture designed at Google, aimed to run quickly on modern mobile devices (such as newer smartphones). A common practice is to train MobileNet to classify objects on a given dataset, then remove the final layers, concatenate it with another model (with MobileNet acting as a feature extractor) and end up with an object detector.
+
+Since MobileNet was designed for mobile devices, it traded some classification accuracy for performance. However, the architecture is remarkable in that the performance increase is significant while the classification accuracy decrease is not.
 
 Next was the choice of the actual object detector. There are two (TODO: check this) main ideas for this approach: one could get an image classifier and apply it to the image multiple times (such as 25 times) resulting in a grid of overlapping detections.
-
-{\Large Show image here}
-\hrule
-
-Using the prediction probability for each part of the image, one can estimate where in the frame the desire object(s) is. This has the advantage of allowing for a simpler network architecture, but comes at the cost of performance (as the neural network must be applied multiple times) and resolution (determined by the grid size, which determines the run time). This is known as the 'sliding window' technique.
-
-The other approach uses the fact that the neural network can locate objects in the frame, and thus returns the locations of objects in the image embedded in the output nodes. An example of this type of network is the Single Shot Detector (SSD) which, as the name suggests, requires only a single inference to output a list of objects, their classification probabilities and their locations in the frame.
-
-[ TODO: RESULTS: talk about trying to make my own network with two output nodes, which simply predicts the centroid of the object as a scale from -1 to 1, with -1 being the bottom or left side of the image and 0 being the center. Couldn't get it to compile due to tensorflow support ]
-
-\subsection{Comparison of neural network frameworks}
-% speeds: https://arxiv.org/pdf/1608.07249v7.pdf
-Tensorflow - low level, annoying and hard to use, fast
-Keras - simple to use, tensorflow as backend so relatively fast, less fine grained control possible, can't find all the latest models there, can export model as tensorflow
-Caffe - fast, easy to use, hard to extend, only really for CNNs, might be dying out

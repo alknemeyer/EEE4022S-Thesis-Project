@@ -1,5 +1,15 @@
-\chapter{Neural network and NCS}
+\chapter{Computer vision implementation}
 
-{\Large \color{red} Had great difficulties. Limited choice of nn framework (tensorflow object detection isn't supported) and neural network architectures }
+\section{Workstation setup and testing}
+{\Large \color{red} talk about installing all the software, setting up + testing picam, etc}
 
-{\Large \color{red} WENT FROM $\approx 1 Hz$ to $\approx 10 Hz$ }
+
+
+
+
+\section{Selection of framework and neural network architecture}
+At the time of writing, the Movidius NCS only supports the tensorflow and Caffe machine learning frameworks. After far too much frustration, it was discovered that the support for each framework was far from equal - in fact, it is impossible to compile most tensorflow object detection architectures to the Movidius graph format as the tensorflow \pyth{concat} operation is simply not yet supported. This left Caffe as the only other available framework.
+
+{\Large \color{red} talk about why I chose MobileNet + SSD}
+
+

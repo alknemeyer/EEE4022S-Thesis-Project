@@ -1,2 +1,12 @@
 \chapter{Recommendations}
-test text
+
+ideas:
+\begin{itemize}
+	\item track global x,y coordinates of cheetah. Requires depth estimating nn or distance sensor (tricky because you aren't always point at cheetah). Other option is to your height and elevation to estimate the distance
+	\item get a faster camera (higher FPS)
+	\item faster SBC
+	\item 3-axis gimbal
+	\item avoid movidius, if possible
+	\item add encoder to gimbal or offset camera to avoid lining up accelerometer axis with rotation axis
+	\item consider switching away from python to an even faster language with less garbage collection problems - for example, julia. Can also be low-level, now that most of the debugging/prototyping has already been done.
+\end{itemize}

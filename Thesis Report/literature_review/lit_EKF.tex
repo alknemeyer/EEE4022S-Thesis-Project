@@ -1,8 +1,8 @@
-\section{Extended Kalman Filter}
-\subsection{An introduction to the Kalman Filter}
-A Kalman Filter \cite{kalman1960new} is an algorithm used to estimate the state of a linear system ($\hat{x}$) along with the uncertainty of the estimate ($P$) based on noisy measurements over time ($z$, with noise covariance $R$). It makes use of a model of the system ($F$) which represents the dynamics of the system ($\hat{x}_{k} = F\hat{x}_{k-1}$, with process noise $Q$) and measured factors which affect the state, which aren't part of the current set of states ($u$). It takes into account the sensor measurement which maps from sensor measurements to state values ($H$).
+\section{The Extended Kalman Filter}
+\subsection{An brief introduction to the Kalman Filter}
+A Kalman Filter \cite{kalman1960new} is an algorithm used to estimate the state of a linear system ($\hat{x}$) along with the uncertainty of the estimate ($P$) based on measurements over time ($z$). The experiments are assumed to be noisy, with covariance $R$. It makes use of a model of the system ($F$) which represents the dynamics of the system ($\hat{x}_{k} = F\hat{x}_{k-1}$), along with a model which represents inaccuracies in the model, dubbed 'process noise' ($Q$) and measured factors which affect the state, but aren't part of the current set of states ($u$). It takes into account the sensor scaling which maps from between sensor measurements and state values ($H$).
 
-A variety of excellent resources exist which explain the a deeper intuition behind the Kalman Filter \cite{website:wlu_kalman_tutorial, website:bzarg_kalman_tutorial}. Thus, only the relevant equations will be discussed in this chapter.
+A variety of excellent resources exist which explain the a deeper intuition behind the Kalman Filter \cite{website:wlu_kalman_tutorial, website:bzarg_kalman_tutorial}. Thus, only the crucial equations and concepts will be discussed in this chapter.
 
 In the 'predict' stage, the Kalman Filter uses a model of the system and known disturbances to update the state estimate and uncertainty estimate. These are represented by the equations,
 
@@ -16,12 +16,20 @@ In the 'update' stage, the Kalman Filter makes use of a model of uncertainty est
 where the Kalman gain $K$ at a time $k$ is calculated as,
 \[ K_k = P_k H_k^T (H_k P_k H_k^T + R_k)^{-1} \]
 
-These stages are alternated as \emph{predict} $\rightarrow$ \emph{update} $\rightarrow$ \emph{predict} $\rightarrow$ \dots As an illustration, after running the predict stage, consider the extremes: when $K = 0$, we have $\hat{x}_k = \hat{x}_{k-1} + 0 (z_k - H_k x_k) = \hat{x}_{k-1}$. If $H_k = 1$, whe $K = 1$, we have $\hat{x}_k = \hat{x}_{k-1} + (z_k - x_k) = z_k$. Values in between result in a state update which is some combination of the sensed values and modelled dynamics of the system. The Kalman Filter aims to find the optimal combination.
+These stages are alternated as \emph{predict} $\rightarrow$ \emph{update} $\rightarrow$ \emph{predict} $\rightarrow$ \dots As an illustration, after running the predict stage, consider the extremes: when $K = 0$, we have
+
+\[ \hat{x}_k = \hat{x}_{k-1} + 0 (z_k - H_k x_k) = \hat{x}_{k-1} \]
+
+If $H_k = 1$ and $K = 1$, we have
+
+\[ \hat{x}_k = \hat{x}_{k-1} + (z_k - x_k) = z_k \]
+
+Values in between result in a state update which is some combination of the sensed values and modelled dynamics of the system. Thus, the role of the Kalman Filter is essentially to find the optimal trade off between trusting the model and trusting the sensor readings.
 
 \subsection{An introduction to the Extended Kalman Filter}
 An Extended Kalman Filter (EKF) is simply a nonlinear version of a Kalman Filter, where the transition from estimated state $\hat{x}_{i-1}$ to state $\hat{x}_i$ is some \emph{nonlinear} mapping $f(x, u)$ and the mapping from state values to sensor values is a nonlinear function $h(x)$. It works by using a Taylor approximation to linearize about an estimate of the current mean and covariance.
 
-Implementation-wise, the only difference between the linear and non-linear variants is that the state transition and observation models can be non-linear differentiable functions:
+Therefore, implementation-wise, the only difference between the linear and non-linear variants is that the state transition and observation models can be non-linear differentiable functions:
 
 \[ F \cdot x \rightarrow f(x) \qquad H\cdot x \rightarrow h(x) \]
 
