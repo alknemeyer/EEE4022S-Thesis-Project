@@ -6,15 +6,15 @@ It was required that the system detect the position of an object from a photo. I
 	\item Run at around 5 to 10 Hz,
 	\item Locate the object with high accuracy,
 	\item Work regardless of the orientation of the object, and
-	\item Be able to track any object with minimal extra work/design required.
+	\item Be able to track any object with minimal extra work or design required.
 \end{itemize}
 
 This chapter details the literature sounding methods which could potentially achieve these requirements.
 
 \subsection{Basic computer vision concepts}
-Computer vision techniques tend to use a number of cascaded filters, with each layer of filters being able to detect more and more complex shapes in an image. These filters are known as 'kernels', and tend to be implemented as \pyth{3x3} matrices which are convolved with the input image, a 2D array of pixel values.
+Computer vision techniques tend to use a number of cascaded filters, with each layer of filters being able to detect more and more complex shapes in an image. These filters are known as 'kernels', and tend to be implemented as square matrices which are convolved with the input image, a 2D array of pixel values.
 
-As an example, plotted below is an image before (left) and after (right) being convolved with a vertical line finding kernel.
+As an example, plotted below is a simple image before (left) and after (right) being convolved with a vertical line finding kernel.
 
 \begin{figure}[h!]%
     \centering
@@ -25,9 +25,7 @@ As an example, plotted below is an image before (left) and after (right) being c
     \label{fig:example}%
 \end{figure}
 
-Note how the the vertical line in left part of the input has been found (represented by bright pixels in the output image). The horizontal line on the bottom right has been rejected. The faint vertical line in the top right has been found, albeit faintly. The exact same transformation is shown below, where the leftmost matrix is the input, the middle is the kernel and the rightmost matrix is the output.
-
-
+Note how the the vertical line in the left part of the input has been found (represented by bright pixels in the output image). The horizontal line on the bottom right has been rejected. The faint vertical line in the top right has been found, albeit faintly. The exact same transformation is shown below, where the leftmost matrix is the input, the middle is the kernel and the rightmost matrix is the output.
 
 \begin{table}[h!]
 	\centering
@@ -52,41 +50,43 @@ As an example of a complete system, the first layer of kernels may detect vertic
 
 Carefully designing and combining these filters can ultimately result in the detection of an object. However, this method is incredibly time consuming and requires extensive domain-specific knowledge. Even after the work has been put in to locate one type of object in a frame, locating another type of object may require the user to start from scratch.
 
-\subsection{Introduction to machine learning}
+\subsection{A brief introduction to machine learning}
 
-Luckily, there exist other methods of creating and combining the kernels mentioned previously. Instead of hand-crafting each kernel and deciding how they should be combined, one could instead use machine-learning techniques (in which a computer can use a dataset of input-output pairs to learn the parameters of a model) to create kernels with 'optimal' values to find objects in a frame. This boils down to using data (known input-output pairs of an image of cheetah, and the label "cheetah") to optimize neural network.
+Luckily, there exist other methods of creating and combining the kernels mentioned previously. Instead of hand-crafting each kernel and deciding how they should be combined, one could instead use machine-learning techniques (in which a computer can use a dataset of input-output pairs to learn the parameters of a model) to create kernels with 'optimal' values to find objects in a frame. This boils down to using data (known input-output pairs of an image of cheetah, and the label "cheetah") to optimize the kernel values in the neural network.
 
-The standard method of doing this for images is through the use of Convolutional Neural Networks (CNNs). CCNs are initialized with random values in their kernels and random weights which combine the outputs of their kernels - only their general architecture is fixed by human practitioners. The method to get accurate weights is then as follows:
+The standard method of doing this for images is through the use of Convolutional Neural Networks (CNNs). CCNs are initialized with random values in their kernels and random values for the transformations which combine the outputs of their kernels - only their general architecture is fixed by human practitioners. These values are known as 'weights'. Calculations are performed by 'neurons' - nodes in the CNN which perform an operation. The method to get accurate weights is as follows:
 
 \begin{enumerate}
-\item Initialize the CNN with random values in the kernels and weights between 'neurons' (nodes in the CNN which perform an operation).
-\item Pass an image through all the neurons in the CNN, and take note of the output.
-\item Get the error (the difference between the CNN output and the correct answer) and propagate it back through the CNN, adjusting the weights \emph{slightly} in such a way that that same input would produce the correct output if run again.
+\item Initialize the CNN with random weights.
+\item Pass an image through the CNN, and take note of the output.
+\item Get the error (the difference between the CNN output and the correct answer) and propagate it back through the CNN, adjusting the weights \emph{slightly} in such a way that that same input would produce the correct output if run again. This is known as 'back-propagation'.
 \item Repeat the first three steps a few hundred or thousand times, using a large, diverse dataset.
 \end{enumerate}
 
 While it is possible that the CNN will act as a look-up table (mapping those specific inputs to their correct outputs, but giving the wrong result for any other dataset) it is hoped that the CNN will instead map any \emph{similar} input to the correct output. As an example, a correct training CNN will map any image which \emph{looks} like a cheetah (has the correct body structure, spots, ear location, etc) to an output which is numerically encoded to represent "cheetah".
 
-It should be noted that CNNs are nothing more than a mapping from a vector of input pixels to a vector which represents certain outputs (such as "cheetah", "no cheetah" or even the coordinates of a cheetah).
+It should be noted that CNNs are nothing more than a mapping from a vector of input pixels to a vector which represents certain outputs (such as "cheetah", "no cheetah" or even the coordinates of a cheetah). Thus, in essence, this entire process is the solution to an optimisation problem: how to find the best set of weights to correctly map an input to the correct output.
 
-CNNs simply require a few hundred or thousand labelled images and a few hours on a modern GPU. There are many open datasets which can be used to make this work easier.
+CNNs simply require a few hundred or thousand labelled images and a few hours on a modern GPU. There are many tips, tricks and open datasets which can be used to make this work easier.
 
 \subsection{Key machine learning concepts and definitions}
-Before getting lost in ReLU, dropout and the rest of the endless list of ideas in machine learning, it is worth considering the separation of jobs in in modern data science. Typically, there is one team which designs the neural network architecture, tunes hyper-parameters (import parameters usually set by humans), publishes results, and son on. This requires a certain set of skills.
+Before getting lost in ReLU, dropout and the rest of the endless list of ideas in machine learning, it is worth considering the separation of jobs in in modern data science. Typically, there is one team which designs the neural network architecture, tunes hyper-parameters (important parameters usually set by humans), publishes results, and so on. This requires a certain set of skills.
 
-Next, another person with a separate skill set puts the neural network in production in order to achieve some goal, possibly after training it them self. If you find yourself in the second group of people, you don't tend to need to keep up with every new paper published. Instead, armed with some understanding of the main innovations in each network design, you only need compare training techniques and architectures as a whole.
+Next, another person with a separate skill set puts the neural network into production in order to achieve some goal, possibly after training it them self. If you find yourself in the second group of people, you don't tend to need to keep up with every new paper published. Instead, armed with some understanding of the main innovations in each network design, you only need compare some training techniques and architectures as a whole.
 
-Since the project at hand doesn't necessitate a brand new architecture, only a handful ideas need to be discussed.
+Since the project at hand doesn't necessitate a brand new architecture, we find ourselves firmly in the latter group. THus, only a few ideas need to be discussed.
 
 \textit{Machine learning, neural networks, deep learning, CNNs}: machine learning is the branch of computer science involved in fitting a model using data alone. Neural networks are a subset of machine learning, specifying a class of architectures loosely inspired by the synapses in the nervous system of an organic brain. Deep learning is the relatively recent practice of creating especially long neural networks in order to represent more complex mappings. Finally, CNNs are a subset of deep learning, in which the synapses of a deep neural network are kernels which perform convolution operations.
 
-\textit{Image classification vs object detection:} an image classifier indicates \emph{what} object(s) are in an image. An object detector finds what objects are in the image, and also \emph{where} in the image they can be found. One might think to perform object detection using an image classification CNN by sliding the network over various overlapping parts of the input image, taking note of what part of the image the network is looking at when it finds an object - interestingly, this is almost exactly what object detectors do internally. In fact, it's exactly what convolution with a kernel does.
+\textit{Image classification vs object detection:} an image classifier indicates \emph{what} objects are in an image. An object detector finds what objects are in the image, and also \emph{where} in the image they can be found. One might think to perform object detection using an image classification CNN by sliding the network over various overlapping parts of the input image, taking note of what part of the image the network is looking at when it finds an object. Interestingly, this is almost exactly what object detectors do internally! In fact, ignoring some minor details like 'strides' and 'pooling', it's almost exactly what convolution with a kernel does.
 
-\textit{Bounding box: (or 'anchor'):} a pair of points which determine a box around a detected object.
+\textit{Bounding box:} also known as an anchor, a bounding box is a pair of points which determine a box around a detected object. Two $(x, y)$ pairs of numbers are usually part of the output of an object detection neural network.
 
-\textit{Feature extractor:} it is common practice to concatenate an well-designed existing neural network with another architecture to produce a new, larger model which performs an overall more complex task. Thus, the role of the first part of the new model is to extract useful features for the second part to process.
+\textit{Feature extractor:} it is common practice to concatenate an well-designed existing neural network architecture with another architecture to produce a new, larger model which performs an overall more complex task. Thus, the role of the first part of the new model is to extract useful features for the second part to process. In this way, neural networks can be a bit like Lego.
 
 \textit{Transfer learning:} this refers to the practice in which the weights of one neural network are copied to another network. This enables problems to be solved using much less data than neural networks ordinarily require, as the weights are already quite good before the retraining process. The idea is that the early layers are likely to have been trained to find very general features in the image (such as lines, circles, eyes, tails, etc). These are often relevant to a wide variety of problems. This is why a trained network will often have its training dataset specified - the content of the training dataset is a good indicator of whether transfer learning would help in a different problem.
+
+{\Large \color{red} talk about some training specific parameters?}
 
 \textit{Epoch:}
 
@@ -94,7 +94,7 @@ Since the project at hand doesn't necessitate a brand new architecture, only a h
 
 \textit{Loss:}
 
-\subsection{Movidius Neural Compute stick}
+\subsection{A brief introduction to neural accelerator sticks}
 CNNs tend to require a large number of operations to produce an output. The exact amount of computation required depends on the neural network architecture, though even 'small' object detectors generally require on the order of millions of multiply-accumulate instructions with significant amounts of data being loaded to and from the various levels of cache. Combined with the slower processor on embedded computers such as a raspberry pi, the neural network would not be able to run in real time (inference time less than $\approx 100ms$). As an example, a cutting edge object detection network designed for use on mobile devices requires about 1 second to infer a result on the raspberry pi's CPU.
 
 % nn and params: https://mxnet.apache.org/api/python/gluon/model_zoo.html

@@ -1,15 +1,49 @@
 \chapter{Computer vision implementation}
 
+This chapter describes the steps required to establish a complete computer-vision workflow. It also describes the decisions made and, importantly, discusses the lessons.
+
+Unlike other chapters in this report, it is likely that the methodology presented here will quickly become outdated - multiple computer vision frameworks are competing for market attention, and changing a lot while doing so. In addition, neural accelerator technology is in its infancy and likely to improve a lot in the coming years. Thus, the section is presented as a general methodology which tries to be independent of framework and branding where possible.
+
+It should be noted that a lot of mistakes were made in this part of the project - these won't be discussed.
+
 \section{Workstation setup and testing}
-{\Large \color{red} talk about installing all the software, setting up + testing picam, etc}
+Three independent computers were used as part of the complete computer vision workflow - a somewhat powerful GPU-equipped computer to prototype and train the neural network, a regular laptop to test and compile a trained neural network and an small embedded computer which uses the neural accelerator for inferencing.
+
+\subsection{Setting up a computer for training}
+{\Large \color{red} talk about this section after I've actually done it...}
+{\Large \color{red} could be any GPU enabled PC (that can run CUDA) if it's fine tuning, should be quite powerful otherwise}
+
+\subsection{Setting up a computer for testing and compiling}
+Most simple tests were run on an easily accessible computer. This computer must run a Ubuntu 16.04, as it is the only non-Raspbian desktop OS the Movidius SDK officially supports. Movidius software barely works as is, so it is not recommended to push things even further by messing around with any other OS.
+
+One good option is to run Ubuntu on a virtual machine, such as Oracle VirtualBox. If you do this, don't try to make it work with the NCS - it can be quite tricky getting the drivers to work. Instead, trust that the compiled network will perform as well on the NCS as it does in the uncompiled framework-specific format and save yourself a lot of time.
+
+%https://software.intel.com/en-us/neural-compute-stick/get-started
+Next, install the Movidus SDK, as described in the documentation. Despite what the documentation suggests, there isn't a need to \pyth{make} all the examples - this can take a couple hours, use a lot of disk space and not help at all.
+
+After this, the previously trained neural network should be compiled to the Movidius-specific graph format using the \pyth{mvNCCompile} command. If it fails, it is likely that the network has an operation which isn't supported by the Movidius software. To this end it is highly recommended to check whether the operations used in the neural network are supported by Movidius for that particular frame. Note that, at the time of writing, some operations are supported for caffe but not for tensorflow.
+
+If the Movidius SDK installation process has not already done so, it is recommended to install the deep learning framework that will be used. This enables some offline debugging.
 
 
+\subsection{Setting up a computer for inferencing}
+A Raspberry Pi was chosen as the embedded computer that would interface with the neural accelerator. In order to get it ready for the final platform, some packages needed to be installed.
+
+For fast numerical computing, the \pyth{numpy} package was installed - this is practically a default for most python programs.
+
+A Pi Camera v2 was used to take photos. In order to use it, the \pyth{picamera} package needed to be installed.
+
+Interestingly, it is not actually necessary to install any deep learning framework on the Raspberry Pi. Neither is it necessary to install \pyth{opencv} or even the full Movidius SDK if the neural network has already been compiled to a graph file. Knowing this can save you an absolutely incredible amount of time, as these programs can be incredibly time consuming and frustrating to install. For instance, installing the full Movidius SDK on the Raspberry Pi requires upwards of 10 hours and is prone to failing at almost any point in this installation.
+
+% https://movidius.github.io/blog/ncs-apps-on-rpi/
+Thus, it is \emph{highly} recommended to instead skip all of these potential issues and rather just install the Movidius SDK in API-only mode. This doesn't take long and is not prone to failure.
 
 
-
-\section{Selection of framework and neural network architecture}
+\section{Selection of framework and CNN architecture}
 At the time of writing, the Movidius NCS only supports the tensorflow and Caffe machine learning frameworks. After far too much frustration, it was discovered that the support for each framework was far from equal - in fact, it is impossible to compile most tensorflow object detection architectures to the Movidius graph format as the tensorflow \pyth{concat} operation is simply not yet supported. This left Caffe as the only other available framework.
 
 {\Large \color{red} talk about why I chose MobileNet + SSD}
 
 
+\section{Observed performance}
+{\Large \color{red} went from $\approx 1 Hz$ to $\approx 10 Hz$ using the NCS}

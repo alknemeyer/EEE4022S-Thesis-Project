@@ -46,7 +46,7 @@ Thus, it was decided that these would be left as parameters to be tuned using re
 
 While python wasn't designed for purely numerical programming (such as matrix multiplication), when the correct packages are used it can approach C-level speeds. \pyth{numpy} is one such package - it provides python bindings to C arrays, resulting in incredible speedups over regular python arrays.
 
-Thus, the Kalman Filter and Extended Kalman Filter were implemented as python classes which contain \pyth{numpy} matrices. A snippet of this can be seen below. \\
+Thus, the Kalman Filter and Extended Kalman Filter were implemented as python classes which contain \pyth{numpy} matrices. A snippet of the implementation can be seen below, while the rest of the code can be found on the author's GitHub page. \\
 
 \begin{python}
 class KalmanFilter():
@@ -62,10 +62,36 @@ class KalmanFilter():
         self.Q = np.matrix([[Q*(Ts**2),    0, 0],
                             [        0, Q*Ts, 0],
                             [        0,    0, Q]])
-        self.R = R
 \end{python}
 
 \section{Tuning the process noise and sensor uncertainty}
+The next step was to find and set reasonable values for the process noise $Q$ and sensor uncertainty $R$. This was doing by running the computer vision algorithm while a human walked and ran around the lab. The results of this were saved to a file, allowing for easy offline simulation. A plot of the raw updates from the neural network are shown below, in Figure~\ref{fig:raw_nn_results}.
 
-{\Large \color{red} Q and R tuned by recording real data, then adjusting them until the simulations looked 'right'}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{methodology/raw_nn_results}
+  \caption{\label{fig:raw_nn_results} A plot showing the outputs of the neural network, and the timing thereof.}
+\end{figure}
 
+Note how the time between inferences from the neural network is not constant - while all of the calculations in the neural network are the same in each run, non-constant run times are the natural consequence of running a control loop on a non real time operating system and using a programming language which stops occasionally for garbage collection.
+
+In addition, there are times when a few hundred milliseconds pass without receiving a new update - this occurs when the neural network can't find an object in the frame. It is worth noting that the neural network is in fact very good at locating objects, and misses them infrequently. However, the frequent and large gaps in object locations was added in order to simulate tracking an object which may disappear behind a bush or some other obstacle.
+
+Next, a small script was made to speed up the trial-and-error process of comparing the advantages and disadvantages of a variety of $Q$ and $R$ values. In addition, the possibility of switching to a Kalman Filter and changing the acceleration modifying parameter $\beta$ were added. In the end, values were chosen to satisfy the following two criteria:
+
+\begin{enumerate}
+\item Trust the updates from the neural network more than the model itself. This was decided on because the network was known to accurately find objects in a frame, whereas the constant velocity or acceleration model was \emph{known} to be incorrect.
+\item Make reasonable predictions in the event that no updates appeared from the neural network. 'Reasonable' meant that, if the data indicated that the object was moving in a certain direction at a certain velocity, it is reasonable that the object would keep moving in that direction and at that velocity.
+\end{enumerate}
+
+A plot of the interactive process and selected paramters is shown below, in Figure~\ref{fig:tuning_Q_R}.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{methodology/tuning_Q_R}
+  \caption{\label{fig:tuning_Q_R} A plot of the output of the EKF given stem plot data as input.}
+\end{figure}
+
+As can be seen in Figure~\ref{fig:tuning_Q_R}, choosing $Q = 0.5$, $R = 0.005$ and $a = 0.95$ resulted in an EKF which closely follows and trusts the updates from the neural network, whilst making reasonable predictions in the event that no data was received. It is worth noting that the input data was more sinusoidal than 'roughly constant velocity', which was the main assumption behind the dynamics of the model. This was due to a lack of running space in the mechatronics engineering lab - once wall has been reached, there's no place to go except backwards.
+
+This concluded the implementation of the Extended Kalman Filter.

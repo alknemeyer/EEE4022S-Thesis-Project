@@ -10,9 +10,9 @@ There are a number of applications for systems which track an object autonomousl
 
 \textit{Autonomous:} a human could (in principal) manually track an object using their own vision and natural object-recognition ability. However, this isn't feasible for many applications: this type of job can be fairly boring, resulting in the human losing concentration over time. Another issue is that the human must be paid to perform this task. This completely excludes all applications which must have a low running cost.
 
-In contrast, autonomous tracking systems require little to no ongoing work, and thus can have vastly reduced running costs with higher reliability over long run times.
+In contrast, autonomous tracking systems require little to no ongoing human work - as a result, they tend to have vastly reduced running costs with higher reliability over long run times.
 
-\textit{Real-time:} {\Large \color{red} not all systems run in realtime, but many applications require this}
+\textit{Real-time:} not all tracking systems can run time real-time (in other words, with a latency less than a few hundred milliseconds). For example, one might film a moving object and then automatically locate the objects position in the frame offline. However, many systems must track an object in real-time so as to be able to (for example) orient a camera to point at the object, or result in some other live response.
 
 \textit{Computer-vision based}: many tracking systems require a device to be placed on the object being tracked. Some still require a camera - for example, one could place an infra-red beacon on the object and pair it with a camera with an appropriate lens. Others involve no cameras, and instead use embedded sensors alone (such as GPS, accelerometers and gyrometers). Again, while this may be acceptable for some systems, it comes at a cost: some sort of device must be placed on the object. If the object is a cheetah, this may cause a disturbance. The device must be kept charged, so frequent interference with the object is required. Physical contact must be made with the object to install the tracker - this isn't always possible.
 
@@ -21,17 +21,13 @@ In contrast, object tracking based on computer vision doesn't require any device
 However, these benefits come at a cost: the object must be close enough to the camera system that the object can be recognised. In contrast, an embedded GPS, IMU and radio system could track objects kilometres away.
 
 % https://en.wikipedia.org/wiki/Infra-red_search_and_track
-{\Large \color{red} ALSO talk about vision-based, which don't use ML}
-It is also worth discussing movement-based tracking system. As an example, 
-can't differentiate between types of things very well. can't track all types of objects.
+There are other vision-based systems which don't use computer-vision techniques. For example, there are tracking systems which don't differentiate between classes of objects, but instead track any movement in the frame. These systems tend to be relatively cheap, but since they can't differentiate between types of objects, they don't work for all scenarios.
 
-{\Large \color{red} ALSO discuss things like radar, which send off a ping}
-good range, give away position, can't differentiate very well (only car vs human but not human vs dog or male vs female), not amazing resolution.
+Finally, there are other systems which can track objects without embedding a tracker or using vision. Technologies like radar, can send off a ping and then build a view of the environment. Radar tends to give good range (significantly further than vision would give), but can't differentiate between types of objects very well. For example, a radar system might be able to differentiate between a car and a human from 1km away, but not human from a dog. It also doesn't work well at closer distances, and tends to cost a lot.
 
-{\Large \color{red} maybe put this comparison in a table??}
-ADD: not to say one is BETTER than the other, but rather that many many things need to be tracked and each approach should be considered.
+{\Large \color{red} maybe put all this info in a table for comparison? or make it shorter?}
 
-
+None of this is meant to imply that one technology is on the whole better than the other, but rather that many things need to be tracked and each approach should be considered, as they all have advantages and disadvantages.
 
 
 
@@ -45,4 +41,4 @@ There are a large number of applications for a system which can track objects in
 \item A camera system which automatically tracks a ball or centroid of the position all players, helping to record sports games.
 \end{itemize}
 
-Some drone companies have already implemented computer-vision based tracking systems into their products. One example is DJI, which incorporates autonomous human tracking as one of the features of their Mavic line of drones. Another example is eyecloud, a company that has developed a security system which covers a wider area than a single static camera could, and only sends an alert when it detects humans (but not dogs, which would be a false alarm).
+Some drone companies have already implemented computer-vision based tracking systems into their products. One example is DJI, which incorporates autonomous human tracking and following as one of the features of their 'Mavic' line of drones. Another example is EyeCloud, a company that has developed a security system which covers a wider area than a single static camera could, and only sends an alert when it detects humans (but not for dogs, which would likely be a false alarm).
