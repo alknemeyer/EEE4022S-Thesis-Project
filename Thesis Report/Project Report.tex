@@ -12,6 +12,7 @@
 \usepackage{hyperref}  % used for \href and urls in .bib
 \usepackage{xcolor}  % use to colour text
 \usepackage{subfig}  % putting packages side by side
+\usepackage{textcomp} % degree symbol
 
 %\usepackage{listings}
 \usepackage{pythonhighlight}
@@ -21,6 +22,17 @@
 %\pyth{__init__}
 
 
+\usepackage{sectsty} % adjust size of chapter headings
+\chapternumberfont{\large}
+\chaptertitlefont{\Huge}
+
+\usepackage{titlesec} % decrease the whitespace at chapter start
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-40pt}{10pt}
+%			{shift right/left}, {up/down}, {between title and text}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % page formatting
 \parskip = 6mm

@@ -1,5 +1,7 @@
 \chapter{EKF Modelling and Design}
 
+{\Large \color{red} write intro to this section}
+
 \section{System modelling}
 An EKF was used to estimate the state of the tracked object as it moves around. Since the camera system generally rotates around an axis and there is no reliable estimate of the distance from the camera to the object being tracked, it was decided that the state would be measured in angular coordinates.
 
@@ -64,7 +66,13 @@ class KalmanFilter():
                             [        0,    0, Q]])
 \end{python}
 
-\section{Tuning the process noise and sensor uncertainty}
+\subsection{KF/EKF stuffs}
+{\Large \color{red} talk about how the EKF is basically the same code as the KF, with the exception that the $h$ and $\frac{\delta h}{\delta x}$ functions are modified.}
+
+\subsection{EKF timing issues}
+{\Large \color{red} talk about how I have to continuously change $F$ and $Q$ to account for the changing timing in the system}
+
+\subsection{Tuning the process noise and sensor uncertainty}
 The next step was to find and set reasonable values for the process noise $Q$ and sensor uncertainty $R$. This was doing by running the computer vision algorithm while a human walked and ran around the lab. The results of this were saved to a file, allowing for easy offline simulation. A plot of the raw updates from the neural network are shown below, in Figure~\ref{fig:raw_nn_results}.
 
 \begin{figure}[h!]
