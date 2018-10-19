@@ -21,23 +21,37 @@
 %\end{python}
 %\pyth{__init__}
 
-
 \usepackage{sectsty} % adjust size of chapter headings
 \chapternumberfont{\large}
 \chaptertitlefont{\Huge}
 
+\usepackage{wrapfig} % wrap text around figures
+%\begin{wrapfigure}{R}{5.5cm}
+%\caption{A wrapped figure going nicely inside the text.}\label{wrap-fig:box_around_blossom}
+%\includegraphics[width=5.5cm]{methodology/box_around_blossom}
+%\end{wrapfigure}
+
+
 \usepackage{titlesec} % decrease the whitespace at chapter start
 \titleformat{\chapter}[display]
-{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
-\titlespacing*{\chapter}{0pt}{-40pt}{10pt}
-%			{shift right/left}, {up/down}, {between title and text}
+{\normalfont\large\bfseries}{\chaptertitlename\ \thechapter}{0pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-40pt}{5pt}
+%	  {shift right/left}, {up/down}, {between title and text}
+
+
+% add lines by header and footer
+%\usepackage{titleps}
+%\newpagestyle{ruled}
+%{\sethead{}{Header}{}\headrule
+%  \setfoot{}{Footer}{}\footrule}
+%\pagestyle{ruled}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % page formatting
-\parskip = 6mm
+\parskip = 4mm
 \parindent = 0mm
-\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\headrulewidth}{0.4pt}
 \rhead[]{\thesection}
 \lhead[\thechapter]{}
 
@@ -150,10 +164,10 @@ thanks family and friends
 \include{introduction}
 \include{literature_review/literature_review}
 \include{literature_review/lit_nn}
-\include{literature_review/lit_gimbal}
 \include{literature_review/lit_EKF}
-\include{literature_review/lit_controller}
-\include{research_design_and_timeline}
+\include{literature_review/lit_gimbal}
+%\include{literature_review/lit_controller}
+%\include{research_design_and_timeline}
 %\include{Methodology}
 %\include{methodology/meth_system}
 \include{methodology/meth_nn}

@@ -1,20 +1,11 @@
 {\Large Abstract}\\
 \hrule
 
-{\Large \color{red} don't forget to update this at the end}
+% type a summary that identifies the purpose, problem, methods, results, and conclusion of your work
 
 % [Explain the need/uses]
-Many systems require a camera to identify the objects in its field of view, and then rotate the camera to keep it aimed at a certain class of object. Examples of this need include filming cheetahs to further research into bio-mimicry, having a quadcopter record and follow a sports-person as they move around, and helping wildlife parks to spot and track poachers before they can cause harm.
+Many systems require a camera to autonomously identify the objects in its field of view, and then rotate the camera to keep it aimed at a certain class of object.
 
-% [Paragraph on computer vision]
-Luckily, the field of computer vision has seen a recent surge in performance - in fact, methods such as neural networks often achieve higher accuracy scores than humans in tasks such as object detection. The technology is in general very accessible, with a strong culture of open-research and open-source.
-
-% [Paragraph on raspberry pi + NCS]
-However, image recognition using neural networks is an extremely compute intensive task. The nature of the computation suits parallelization, but inferring a result from an underpowered mobile device (such as a raspberry pi, which is a type of single board computer) can take a full second or longer. Again there exists a solution: neural accelerators, which are essentially GPUs on USB sticks. These enable object detection in near real-time.
-
-% [Paragraph on EKF]
-Despite the speed-ups offered by neural accelerator sticks, the maximum number of inferences possible per second is still somewhat low. In this respect, a Kalman Filter can be useful. It enables the computer to predict where the tracked object will be in between updates from the neural network.
-
-Thus, the aim of this project is as follows: using a modern neural network architecture, identify and track cheetahs from a mobile platform. The computing power is limited (a Raspberry Pi and Movidius Neural Compute Stick) which results in slow update rates. In addition, only position is measured. Thus, a Kalman Filter is used to help ensure robust and smooth tracking of the target. In order to rotate the camera and the rest of the payload, a gimbal was also designed.
+This report describes the design and implementation of such as system on a low-powered device. A Convolutional Neural Network is used to identify the position of objects from photos, making use of a neural accelerator device to achieve near real-time inferences. These measurements are improved through the use of a Kalman Filter, which estimates the angular state of the tracked object with respect to the camera. A multiprocess pipeline is used to manage the control on a non-real time OS. Finally, a gimbal is designed and built to manage the unique payload.
 
 \newpage
