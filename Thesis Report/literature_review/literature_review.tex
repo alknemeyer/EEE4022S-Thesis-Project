@@ -7,28 +7,27 @@ The design of an live object tracker on a low-power computer necessitates severa
 
 
 
-%https://en.oxforddictionaries.com/definition/track
-\textit{Track: follow the trail or movements of (someone or something), typically in order to find them or note their course.}
+\textit{Track: follow the trail or movements of (someone or something), typically in order to find them or note their course \cite{website:definition_track}.}
 %
 A number of systems which interact with the world must track an object. To give some examples, in our daily lives we as humans visually track other cars when driving, keep an idea of our geographic location and estimate the position and velocity of people as they walk so we don't bump into them. Examples more relevant to this project include pointing camera at a ball during a sports match and tracking poachers from the air in a game park.
 
 
-%https://en.oxforddictionaries.com/definition/automatic
-\textit{Automatic: working by itself with little or no direct human control.}
+
+\textit{Automatic: working by itself with little or no direct human control \cite{website:definition_automation}.}
 %
 A human could (in principal) manually track an object using their own vision and natural object-recognition ability. However, this isn't feasible for all applications: this type of job can be fairly boring, resulting in the human losing concentration over time. Another issue is that the human should be paid to perform this task if it is their job. This completely excludes all applications which must have a low running cost.
 
 In contrast, autonomous tracking systems require little to no ongoing human work - as a result, they tend to have vastly reduced running costs with higher reliability over long run times. {\color{red} (cite)}
 
 
-%https://en.oxforddictionaries.com/definition/real_time
-\textit{Real time: relating to a system in which input data is processed within milliseconds so that it is available virtually immediately as feedback to the process from which it is coming, e.g. in a guidance system.}
+
+\textit{Real time: relating to a system in which input data is processed within milliseconds so that it is available virtually immediately as feedback to the process from which it is coming, e.g. in a guidance system \cite{website:definition_real_time}.}
 %
 Not all tracking systems can (or need to) run in real time. For example, one might film a moving object and then automatically locate the objects position in the video offline. However, certain systems must track an object in real time so as to be able to (for example) orient a camera to point at the object, or result in some other live response.
 
 
-%https://www.techopedia.com/definition/32309/computer-vision
-\textit{Computer-vision: a field of computer science that works on enabling computers to see, identify and process images in the same way that human vision does.}
+
+\textit{Computer-vision: a field of computer science that works on enabling computers to see, identify and process images in the same way that human vision does \cite{website:definition_computer_vision}.}
 %
 Some tracking systems require a device to be placed on the object being tracked. Some still require a camera - for example, one could place an infra-red beacon on the object and pair it with a camera with an appropriate lens {\color{red} (cite)}. Others involve no cameras, and instead use embedded sensors alone (such as GPS, accelerometers and gyroscope) {\color{red} (cite)}. Again, while this may be acceptable for some systems, it comes at a cost: some sort of device must be placed on the object. If the object is a cheetah, this could cause a disturbance to the animals behaviour. The device must be kept charged, so periodic interference with the object is required. Physical contact must be made with the object to install the tracker - this isn't always possible.
 
