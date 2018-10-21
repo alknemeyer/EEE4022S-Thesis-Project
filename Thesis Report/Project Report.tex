@@ -39,6 +39,9 @@
 %	  {shift right/left}, {up/down}, {between title and text}
 
 
+%\usepackage{animate} % embed videos
+
+
 % add lines by header and footer
 %\usepackage{titleps}
 %\newpagestyle{ruled}
@@ -61,28 +64,31 @@
 
 \thispagestyle{empty}
 {\Huge \begin{center}
-Autonomous Object Identification and Tracking % title
+Autonomous Object Identification and Tracking using Neural Networks% title
 \hrule
-{\Large ya boi} % subtitle
+%{\Large ya boi} % subtitle
 \end{center}}
 
 \vskip 5mm
 \begin{center}
-\includegraphics[scale = 0.3]{uctLogo.png}
+\includegraphics[scale = 0.5]{uctLogo.png}
 \end{center}
 
 \vskip 5mm
 \begin{center}
-Presented by:\\
-Alexander Lutz Knemeyer
+\textbf{Presented by:}\\
+Alexander Lutz Knemeyer\\
+KNMALE002\\
+Department of Electrical and Electronics Engineering\\
+University of Cape Town
 \end{center}
 
 \vskip 10mm
 \begin{center}
-Prepared for:\\
-Callen Fisher \\
-Edward Boje \\
-Dept. of Electrical and Electronics Engineering\\University of Cape Town
+\textbf{Prepared for:}\\
+Callen Fisher and Edward Boje \\
+Department of Electrical and Electronics Engineering\\
+University of Cape Town
 \end{center}
 
 \vskip 10mm
@@ -91,8 +97,10 @@ Submitted to the Department of Electrical Engineering at the University of Cape 
 \end{center}
 
 \vskip 5mm
-\begin{center}{\bf \today}
-\end{center}
+\begin{center}{\bf \today}\end{center}
+
+{\centering
+\textbf{Key words:} object tracking, autonomous, neural network, Kalman Filter, multiprocess}
 
 \newpage
 
@@ -131,11 +139,21 @@ Date: \ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots
 {\Large Acknowledgements} \\
 \hrule
 
-thanks Callen and Amir \\
-thanks Sylv \\
-thanks Justin Pead \\
-thanks Stacey for laser cutting \\
-thanks family and friends
+{\Huge{} \color{red} update this bit at the end!}
+
+A number of people were immensely helpful in the undertaking of this project. With that in mind I'd like to thank,
+
+Callen for his supervision and guidance.
+
+Justin Pead for his endless patience.
+
+Stacey for laser cutting components for the gimbal.
+
+Neil for proofreading an earlier version of this report. His input was highly appreciated and raised the quality of my writing.
+
+Sylvan for [xxxx]
+
+Finally, my family and girlfriend for their support during this trying time. I don't handle stress very well so our little chats helped a lot with my sanity.
 
 \newpage
 
@@ -171,8 +189,8 @@ thanks family and friends
 %\include{Methodology}
 %\include{methodology/meth_system}
 \include{methodology/meth_nn}
-\include{methodology/meth_gimbal}
 \include{methodology/meth_EKF}
+\include{methodology/meth_gimbal}
 \include{methodology/meth_control}
 \include{results/results}
 \include{discussion}

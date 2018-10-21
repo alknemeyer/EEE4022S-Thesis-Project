@@ -6,6 +6,8 @@
 % [Explain the need/uses]
 Many systems require a camera to autonomously identify the objects in its field of view, and then rotate the camera to keep it aimed at a certain class of object.
 
-This report describes the design and implementation of such as system on a low-powered device. A Convolutional Neural Network is used to identify the position of objects from photos, making use of a neural accelerator device to achieve near real-time inferences. These measurements are improved through the use of a Kalman Filter, which estimates the angular state of the tracked object with respect to the camera. A multiprocess pipeline is used to manage the control on a non-real time OS. Finally, a gimbal is designed and built to manage the unique payload.
+This report describes the design and implementation of such a system on a low-powered device. The system uses a Convolutional Neural Network to identify the position of objects from photos, making use of a neural accelerator device to achieve near real-time inferences. These measurements are improved through the use of a Kalman Filter, which estimates the angular state of the tracked object. A multiprocess pipeline is used to manage the control on a non-real time OS. Finally, a gimbal is designed and built to manage the unique payload.
+
+The tracking system is shown to have improvements over a stationary camera setup.
 
 \newpage

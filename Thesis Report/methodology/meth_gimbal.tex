@@ -20,7 +20,7 @@ Based on these criterion, a gimbal was designed using SolidWorks, a CAD software
 \begin{figure}[h!]
   \centering
   %\includegraphics[width=\textwidth]{methodology/assembled_render}
-  \includegraphics[width=0.7\textwidth]{methodology/assembled_render_no_cameras_motors}
+  \includegraphics[width=0.65\textwidth]{methodology/assembled_render_no_cameras_motors}
   \caption{\label{fig:assembled_render} A render of the gimbal designed for this project.}
 \end{figure}
 
@@ -30,56 +30,49 @@ Figure~\ref{fig:annotated_assembly_with_cams} shows the mount where the payload 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.7\linewidth]{methodology/annotated_assembly_with_cams}
-    \caption{\label{fig:annotated_assembly_with_cams}UPDATE ME!}
+    \includegraphics[width=0.65\linewidth]{methodology/annotated_assembly_with_cams}
+    \caption{\label{fig:annotated_assembly_with_cams}An annotated render of the gimbal, showing where the cameras and distance sensor lie.}
 \end{figure}
 
 As can be seen in Figure~\ref{fig:annotated_assembly_no_cams}, the payload mount could be modified without needing to extend and reprint the mounting brackets. This also had the effect of making it easy to move the mass around to balance the gimbal. The addition of a support bracket mitigated the effect of a potentially large torque from the two cameras. Finally, the holes in the wooden plate on top were filled using vibration dampers.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.7\linewidth]{methodology/annotated_assembly_no_cams}
-    \caption{\label{fig:annotated_assembly_no_cams}UPDATE ME!}
+    \includegraphics[width=0.8\linewidth]{methodology/annotated_assembly_no_cams}
+    \caption{\label{fig:annotated_assembly_no_cams}An annotated render of the gimbal, showing the slots used to balance the gimbal, the hole for the bearing and spaces for vibration dampers.}
 \end{figure}
 
-A final useful feature was the ability to switch between 2- and 3-axis mode by removing one of the motors and L-brackets.
+A final useful feature was the ability to switch between 2- and 3-axis mode by removing the roll motor and top most L-bracket, and rotating the bottom portion of the frame by 90\textdegree.
 
+\section{Assembling the gimbal}
+After the frame had been 3D printed/laser cut, and the controller and motors purchased, the gimbal was ready for assembly.
+
+It was decided that the 2-axis mode would be used for tests: this way, the gimbal would draw less power (due to using two motors instead of three) and there would be an extra motor available in case one broke. It also simplified the balancing process, as there was one less axis to worry about. A photo of the final built gimbal is shown in Figure~\ref{fig:photo_of_gimbal}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{methodology/photo_of_gimbal}
+    \caption{\label{fig:photo_of_gimbal}A photo of the 3D printed and assembled gimbal.}
+\end{figure}
+
+Four LD-Power 2208 gimbal motors were used, mainly because they included in the purchase of the second hand gimbal controller. Due to the small market for gimbals, they are simply rewound high-speed quadcopter/airplane motors, made to work at lower speeds with higher torque \cite{website:rewinding_bldc_gimbal}.
 
 \section{The gimbal controller}
-Properly controlling BLDC motors to stabilize a gimbal is an entire project on its own. Luckily, there are well-designed existing products which easily fulfil the requirements needed. While research was made into the strengths and weakness of the various options available, factors such as local availability, price and time until reception of the gimbal resulted in a single actual choice: purchasing a second hand BaseCam Electronics Simple Brushless Gimbal Controller (SBGC) 32-bit controller {\color{red} (cite)} from someone who used it for drone footage.
+Properly controlling BLDC motors to stabilize a gimbal is an entire project on its own. Luckily, there are well-designed existing products which easily fulfil the requirements needed. While research was made into the strengths and weakness of the various options available, factors such as local availability, price and time until reception of the gimbal resulted in a single actual choice: purchasing a second hand BaseCam Electronics Simple Brushless Gimbal Controller (SBGC) 32-bit controller \cite{website:basecam_sbgc} from someone who used it for drone footage.
 
 The controller is powered off a 8-25V source and has built in power electronics, simplifying the number of components required. Up to three BLDC gimbal motors can be powered off the device.
 
 The angular state of the gimbal is estimated using an IMU placed near the camera. The IMU contains an accelerometer and a gyroscope.
 
-%\subsection{The Serial API}
+\subsection{The Serial API}
 
 It also has an entire serial API which allows an external computer to write commands to and read information from the gimbal. Example commands include setting motor angles and rotation rates, while those same variables can be read from the controllers built in Kalman Filter (which estimates those states).
 
-The controllers serial API is specified in a long {\color{red} xxx} page document. The manufacturer also provides an Arduino implementation of the serial API. However, since the rest of the project was implemented in python, it was decided that the relevant communication protocol would be re-implemented in python. In addition, since a variety of users on the BaseCam forums have mentioned that they would appreciate having access to such a python module, the library will be released for free on the forums.
+The controllers serial API is specified in a 53 page document \cite{website:sbgc_serial_api}. The manufacturer also provides an Arduino implementation of the serial API. However, since the rest of the project was implemented in python, it was decided that the relevant communication protocol would be re-implemented in python. In addition, since a variety of users on the BaseCam forums have mentioned that they would appreciate having access to such a python module, the library will be released for free on the forums. It can be found on the authors \href{https://github.com/alknemeyer/EEE4022S-Thesis-Project/blob/master/Final%20code/gimbal_control.ipynb}{GitHub repository.}
 
 The serial API was made to work by looking through the specification, reading the code in the Arduino implementation and finally visualising the output of the Raspberry Pi using an oscilloscope as a last resort debugging technique.
 
-
-\section{Integrating components}
-Once the frame had been 3D printed, and the controller and motors purchased, the gimbal was ready for assembly and tuning.
-
-\subsection{Gimbal motors}
-Four LD-Power 2208 gimbal motors were included in the purchase of the gimbal controller. Due to the small market for gimbals, most lower-speed, higher-torque 'gimbal motors' are simply rewound high-speed quadcopter/airplane motors {\color{red} (cite)}.
-
-The amount of torque required from a gimbal motor tends to depend more on the balance of the frame and friction in the bearings than other factors, like the rotational inertia of the objects being rotated {\color{red} (cite)}.
-
-{\Huge \color{red} (just stop here! nothing more to see! will need to rewrite the next chapters anyway!)}
-
-\subsubitem{Balancing the system}
-talk about moving things along until the cameras would hold any angle without turning
-
 \subsection{Tuning the controller}
-selected auto-PID but this didn't work
-
-thus, tuned them in order P $\rightarrow$ I $\rightarrow$ D $\rightarrow$ repeat.
-
-\subsection{Testing the serial API}
-
+The gimbal controller offered an 'auto-PID' tuning algorithm, but for known reasons this didn't work very well. Thus, the controller was tuned manually by first adjusted the Proportional term until a fast response was achieved, then the Integrator term until the system began oscillating, and then finally the Derivative term until the overshoot stopped. Then, each term was tweaked until a smooth yet robust response was achieved.
 
 

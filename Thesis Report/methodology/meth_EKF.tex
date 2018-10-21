@@ -1,9 +1,12 @@
 \chapter{EKF Modelling and Design}
 
-{\Large \color{red} write intro to this section}
+The low update rate of the object detector (as mentioned in Subsection~\ref{ssec:meth_nn_performance_increase}) necessitated the use of a Kalman Filter to both increase the reliability of the measurements and to get a better estimate of the objects state in between measurements.
+
+There were a number of design decisions which had to be made when modelling the system and implementing the Kalman Filter. These are discussed in this chapter, as well as some simulation and testing results.
+
 
 \section{System modelling}
-{\color{red} talk about KF vs EKF choice!}
+{\color{red} talk about KF vs EKF choice! - try both, evaluate em both}
 
 An EKF was used to estimate the state of the tracked object as it moves around. Since the camera system generally rotates around an axis and there is no reliable estimate of the distance from the camera to the object being tracked, it was decided that the state would be measured in angular coordinates.
 
@@ -34,11 +37,20 @@ Note that the pixel coordinate of the detected object is given by \pyth{x}, the 
 
 \[ L = \frac{1}{\tan{\theta/2}} = \frac{x}{\tan{\phi}} \]
 Resulting in,
-\[ \phi = \tan^{-1}{\left( \frac{\tan{ \theta/2 }}{x} \right) }
+\[ \phi = \tan^{-1}{\left( x\cdot{}\tan{ \theta/2 } \right) }
 \qquad or
 \qquad x = \frac{\tan{\phi}}{\tan{\theta/2}} \]
+%\phi = \tan^{-1}{\left( \frac{\tan{ \theta/2 }}{x} \right) }
 
-Thus, the mapping from pixel to angle is nonlinear. This is why an EKF was chosen instead of a linear Kalman Filter - a one pixel error in the middle of the image will propagate to a different angular error than a one pixel error at the edge. The Jacobian could then be calculated as,
+A plot of this function is shown in Figure~\ref{fig:pixel_to_angle_plot}. Clearly, the mapping from pixel to angle is nonlinear.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{methodology/pixel_to_angle_plot}
+  \caption{\label{fig:pixel_to_angle_plot}Plot showing the mapping from normalized pixel to angle.}
+\end{figure}
+
+This is why an EKF was considered instead of a linear Kalman Filter - a one pixel error in the middle of the image will propagate to a different angular error than a one pixel error at the edge. The Jacobian could then be calculated as,
 
 \[ \frac{\delta h}{\delta x} = \frac{\delta}{\delta x} \left[ \frac{\tan{\phi}}{\tan{\theta/2}} \right] = \frac{1 + \tan{(\phi)}^2}{\tan{\theta/2}} \]
 
@@ -50,7 +62,7 @@ Thus, it was decided that these would be left as parameters to be tuned using re
 
 While python wasn't designed for purely numerical programming (such as matrix multiplication), when the correct packages are used it can approach C-level speeds. \pyth{numpy} is one such package - it provides python bindings to C arrays, resulting in incredible speedups over regular python arrays.
 
-Thus, the Kalman Filter and Extended Kalman Filter were implemented as python classes which contain \pyth{numpy} matrices. A snippet of the implementation can be seen below, while the rest of the code can be found on the author's GitHub page. \\
+Thus, the Kalman Filter and Extended Kalman Filter were implemented as python classes which contain \pyth{numpy} matrices. A snippet of the implementation can be seen below, while the rest of the code can be found on the authors \href{https://github.com/alknemeyer/EEE4022S-Thesis-Project/blob/master/Final%20code/extended_kalman_filter.ipynb}{GitHub repository.} \\
 
 \begin{python}
 class KalmanFilter():
@@ -71,10 +83,14 @@ class KalmanFilter():
 \subsection{KF/EKF stuffs}
 {\Large \color{red} talk about how the EKF is basically the same code as the KF, with the exception that the $h$ and $\frac{\delta h}{\delta x}$ functions are modified.}
 
+{\Huge \color{red} didn't use EKF in the end (KF worked, and the uncertainty around whether the EKF would always work correctly was greater than the minimal perceived advantages}
+
 \subsection{EKF timing issues}
 {\Large \color{red} talk about how I have to continuously change $F$ and $Q$ to account for the changing timing in the system}
 
 \subsection{Tuning the process noise and sensor uncertainty}
+{\color{red} update + show the final Q matrix}
+
 The next step was to find and set reasonable values for the process noise $Q$ and sensor uncertainty $R$. This was doing by running the computer vision algorithm while a human walked and ran around the lab. The results of this were saved to a file, allowing for easy offline simulation. A plot of the raw updates from the neural network are shown below, in Figure~\ref{fig:raw_nn_results}.
 
 \begin{figure}[h!]

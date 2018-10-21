@@ -1,11 +1,9 @@
 \chapter{Literature Review}
 
-The design of an live object tracker on a low-power computer necessitates several systems, including object detection, camera gimbals and Kalman Filters. The literature relevant to these systems are covered in more detail in this chapter.
+The design of an live object tracker on a low-power computer necessitates several systems, including object detection, a camera gimbal and a Kalman Filter. The literature relevant to these systems are covered in more detail in this chapter.
 
-\section{Importance and applications of real-time computer-vision based automatic tracking systems}\label{sec:compare_cv_techniques}
-{\color{red} rephrase:} The aforementioned problem required a system which can autonomously track an object using a camera and computer-vision techniques alone. That requirement is somewhat heavy on jargon, but it can be unpacked as follows:
-
-
+\section{An introduction to real-time computer-vision based automatic tracking systems}\label{sec:compare_cv_techniques}
+The mechatronics RAM group researchers required a system which can automatically track an object using a camera and computer-vision techniques alone. That requirement is somewhat heavy on jargon, but it can be unpacked as follows:
 
 \textit{Track: follow the trail or movements of (someone or something), typically in order to find them or note their course \cite{website:definition_track}.}
 %
@@ -17,7 +15,7 @@ A number of systems which interact with the world must track an object. To give 
 %
 A human could (in principal) manually track an object using their own vision and natural object-recognition ability. However, this isn't feasible for all applications: this type of job can be fairly boring, resulting in the human losing concentration over time. Another issue is that the human should be paid to perform this task if it is their job. This completely excludes all applications which must have a low running cost.
 
-In contrast, autonomous tracking systems require little to no ongoing human work - as a result, they tend to have vastly reduced running costs with higher reliability over long run times. {\color{red} (cite)}
+In contrast, autonomous tracking systems require little to no ongoing human work - as a result, they tend to have vastly reduced running costs with higher reliability over long run times \cite{website:BCG_automation}.
 
 
 
@@ -29,16 +27,16 @@ Not all tracking systems can (or need to) run in real time. For example, one mig
 
 \textit{Computer-vision: a field of computer science that works on enabling computers to see, identify and process images in the same way that human vision does \cite{website:definition_computer_vision}.}
 %
-Some tracking systems require a device to be placed on the object being tracked. Some still require a camera - for example, one could place an infra-red beacon on the object and pair it with a camera with an appropriate lens {\color{red} (cite)}. Others involve no cameras, and instead use embedded sensors alone (such as GPS, accelerometers and gyroscope) {\color{red} (cite)}. Again, while this may be acceptable for some systems, it comes at a cost: some sort of device must be placed on the object. If the object is a cheetah, this could cause a disturbance to the animals behaviour. The device must be kept charged, so periodic interference with the object is required. Physical contact must be made with the object to install the tracker - this isn't always possible.
+Some tracking systems require a device to be placed on the object being tracked. Some still require a camera - for example, one could place an infra-red beacon on the object and pair it with a camera with an appropriate lens \cite{koyuncu2010survey}. Others involve no cameras, and instead use embedded sensors alone (such as GPS, accelerometers and gyroscope) \cite{sakpere2017state}. Again, while this may be acceptable for some systems, it comes at a cost: some sort of device must be placed on the object. If the object is a cheetah, this could cause a disturbance to the animals behaviour. The device must be kept charged, so periodic interference with the object is required. Physical contact must be made with the object to install the tracker - this isn't always possible.
 
 In contrast, object tracking based on computer vision doesn't require any device to be placed on the object. This is far more scalable, as the same system can track more objects without any additional hardware. Embedded tracker based systems require an additional piece of hardware for every object being tracked.
 
-However, these benefits come at a cost: the object must be close enough to the camera system that the object can be recognised. In contrast, an embedded GPS, IMU and radio system could track objects kilometres away. {\color{red} (cite)}
+However, these benefits come at a cost: the object must be close enough to the camera system that the object can be recognised. In contrast, an embedded GPS, IMU and radio system could track objects to the range of the radio system, provided at GPS lock can be achieved.
 
 %https://en.wikipedia.org/wiki/Infra-red_search_and_track
-There are other vision-based systems which don't use computer-vision techniques. For example, infra-red tracking systems tend to not differentiate between classes of objects, but instead track any movement in the frame {\color{red} (cite)}. These systems tend to be relatively cheap, but since they can't differentiate between types of objects, they don't work for all scenarios. Another issue is that heat-based systems stop working when the external temperature is the same as the temperature of the object being tracked {\color{red} (cite)}. This is an issue for a system which might track a human poacher in 37\textdegree\ weather.
+There are other vision-based systems which don't use computer-vision techniques. For example, infra-red tracking systems tend to not differentiate between classes of objects, but instead track any movement in the frame \cite{sakpere2017state}. These systems tend to be relatively cheap, but since they can't differentiate between types of objects, they don't work for all scenarios. Another issue is that heat-based systems stop working when the external temperature is the same as the temperature of the object being tracked. This is an issue for a system which might track a human with a body temperature of 37.5\textdegree{} in 37\textdegree{} weather.
 
-Finally, there are other systems which can track objects without embedding a tracker or using vision. Technologies like radar can send off a ping and then build a view of the environment based on the returning signal {\color{red} (cite)}. Radar tends to give good range (significantly further than vision would give), but struggles to differentiate between types of objects very well. For example, a radar system \emph{might} be able to differentiate between a car and a human from 1km away, but not human from a dog or car from elephant. It also doesn't work well at closer distances, and tends have a prohibitive cost.
+Finally, there are other systems which can track objects without embedding a tracker or using vision. Technologies like radar can send off a ping and then build a view of the environment based on the returning signal \cite{sakpere2017state}. Radar tends to give good range (significantly further than vision would give), but struggles to differentiate between types of objects very well. For example, a radar system \emph{might} be able to differentiate between a car and a human from 1km away, but not human from a dog or car from elephant. It also doesn't work well at closer distances, and tends have a prohibitive cost.
 
 Of course, there are reasons for and against the use of each of these technologies. These should be considered before deciding on a particular approach for a given project.
 

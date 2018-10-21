@@ -1,15 +1,15 @@
 \chapter{Recommendations}
 
-ideas:
-\begin{itemize}
-	\item track global x,y coordinates of cheetah. Requires depth estimating nn or distance sensor (tricky because you aren't always point at cheetah). Other option is to your height and elevation to estimate the distance
-	\item get a faster camera (higher FPS)
-	\item faster SBC
-	\item 3-axis gimbal
-	\item avoid movidius, if possible
-	\item add encoder to gimbal or offset camera to avoid lining up accelerometer axis with rotation axis
-	\item consider switching away from python to an even faster language with less garbage collection problems - for example, julia. Can also be low-level, now that most of the debugging/prototyping has already been done.
-	\item After the network selection, the TinyYOLO architecture has been added to the list of officially support models. TinyYOLO has some grand claims about its speed, so it should definitely be evaluated as option for future work. Reducing the latency in the system would make the overall project significantly easier.
-\end{itemize}
+There are a number of alternative ideas and approaches which merit investigation, instead of the methodology used as part of this study. The ideas were left unimplemented as they were realised too late in the process or would have required too much time or money.
+
+The list of future recommendations is thus as follows:
+
+\begin{enumerate}
+	\item Instead of tracking the state of the object in angles, try instead tracking it as a an absolute position on a plane surrounding the tracker. This would either require a depth estimating neural network, or a distance sensor which works even when the system doesn't aim directly at the object.
+	\item Get a camera, computer and neural accelerator which decrease the total sensing latency.
+	\item Consider adding an encoder to the gimbal to avoid built up gyroscope drift when an accelerometer axis lines up with with a rotation axis.
+	\item Consider switching the main programming language from python to something faster and better oriented to parallelism. The language could also be low-level, now that most of the debugging and prototyping has already been done.
+	\item After the network selection process occurred in this project, the TinyYOLO architecture was added to the list of models officially supported by the Movidius NCS. TinyYOLO has some grand claims about its speed, so it should be evaluated as option for future work. Reducing the latency in the system would make the overall project significantly easier.
+\end{enumerate}
 
 %Bad things from gimbal: hard to make screws firm+they come loose, didn't make a nice way of keeping cameras inside frame, didn't make nice spot to put pi and gimbal controller.

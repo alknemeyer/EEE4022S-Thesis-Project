@@ -3,6 +3,8 @@ This chapter details the process of combining the project components mentioned i
 
 {\color{red} add more description stuff!}
 
+{\color{red} read over carefully + think about tenses}
+
 \section{Description of software implementation}
 The main negative consequence of choosing a CNN for object detection is the latency introduced by the long inference time. This influenced the system design to a great extent. In addition, the unexpectedly long time required to get a photo from the Pi camera and preprocess it added to the list of compute-intensive latency-causing components. Thus, it was decided that the system would require the use of multiprocessing and message passing, made possible and simple through the use of python's built in \pyth{multiprocessing} module.
 
@@ -21,7 +23,7 @@ Thus, data was passed from one process to the next using parallel processing Que
 A more detailed description of the rest of the general flow diagram and the reasoning behind the choices made is detailed in the following subsections.
 
 \subsection{The photo process}
-In the photo stage, a child process would interface with the Raspberry Pi camera. It received all photos taken, do some preprocessing on each image, and then passed the resulting array to the next stage in the pipeline. It also sent the time at which the photo was taken. A single loop in this stage took around 60-150ms, depending on the chosen camera resolution.
+In the photo stage, a child process would interface with the Raspberry Pi camera. It received all photos taken, did some preprocessing on each image, and then passed the resulting array to the next stage in the pipeline. It also sent the time at which the photo was taken. A single loop in this stage took around 60-150ms, depending on the chosen camera resolution.
 
 \subsection{The inference process}
 In the inference stage, another child process interfaced with the Movidius NCS. It received the preprocessed images from the previous stage and loaded them onto the neural accelerator. While waiting for the inference result, it would occasionally save a copy of the photo to disk for offline debugging purposes. Once it received the result, it would decode the neural net output, put it and the photo time into an easy to use python dictionary and place it in a final buffer. Again, this needed to be in a separate process as the total time required to pass an image to the NCS and then infer a result was about 100ms.
@@ -95,5 +97,5 @@ There is merit to both approaches - the first is more robust, with worse camera 
 
 {\Large \color{red} talk about the time it takes to: take a picture, pre-process the image, load it onto the NCS, get the inference result}
 
-{\Large \color{red} the effect of python's garbage collection}
+{\Large \color{red} the effect of running on a non real time OS}
 

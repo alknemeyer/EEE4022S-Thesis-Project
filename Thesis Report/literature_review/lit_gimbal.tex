@@ -1,5 +1,5 @@
 \section{The camera gimbal}
-A gimbal is device which can rotate about one or more axis {\color{red} (cite)}. A typical use is to place a camera and 3 actuators on a gimbal, resulting in the ability to rotate the camera in the roll, pitch and yaw axis. An annotated render of this can be found in Figure~\ref{fig:roll_pitch_yaw_camera}.
+A gimbal is device which can rotate about one or more axis \cite{website:definition_gimbal}. A typical use is to place a camera and 3 actuators on a gimbal, resulting in the ability to rotate the camera in the roll, pitch and yaw axis. An annotated render of this can be found in Figure~\ref{fig:roll_pitch_yaw_camera}.
 
 \begin{figure}[h!]
   \centering
@@ -10,9 +10,7 @@ A gimbal is device which can rotate about one or more axis {\color{red} (cite)}.
 While gimbal designs are \emph{fairly} standard, a few critical design choices must be made when building or buying one.% The rest of this chapter will detail some of the options available.
 
 \subsection{Comparison of actuator types}
-The type of actuator used in the gimbal has a significant effect on the design of the gimbal, the speed it can move, the camera weight it can handle and quality of the resulting photos and videos {\color{red} (cite)}. Thus, a few relevant actuator types were considered and compared. A summary of some of their relevant characteristics can be found below, in table \ref{table:gimbal_actuators}. Note that because there are a large number options for each actuator type, the metrics are generally more qualitative/comparative than strictly quantitative. The comparisons have been made for actuators which are of the size and cost required by the project, and available at local stores.
-
-{\color{red} rather remove this table, and just cite a study which says BLDC is good. then, leave in the lil summary paragraph}
+The type of actuator used in the gimbal has a significant effect on the design of the gimbal (due to actuator shape), the speed it can move, the camera weight it can handle and quality of the resulting photos and videos (due to actuator vibrations). Thus, three relevant actuator types (a brushed DC motor, a servomotor and a BLDC motor) were considered and compared, taking into account the selection available at local stores.
 
 %\begin{table}[h!]
 %	\centering
@@ -43,9 +41,14 @@ The type of actuator used in the gimbal has a significant effect on the design o
 %\end{table}
 
 %To summarize the main highlights from table \ref{table:gimbal_actuators}:
-DC motors are a poor choice for a system of this type because most options tend to be relatively long and heavy, or require complex gearing. Servo motors are not a good fit because, while they're easy to use (they're essentially a DC motor with circuitry built in {\color{red} (cite)}) and have good torque, they're fairly large and tend to be quite jittery.
 
-This leaves BLDC motors. While they can be quite complex to use and are somewhat expensive, they're compact, fast and tend to result in very smooth footage. As a result, they are the industry standard in camera gimbals {\color{red} (cite)}. It is worth noting that, while the gimbal controller can be fairly complex, using a store-bought controller allows for one to easily leverage off the design work of other engineers. This results in a faster, smoother and more stable gimbal than one could build in a short period of time.
+To make the comparison more concrete, specific possible models were chosen. The DC (Direct Current) motor considered was 99:1 Metal Gearmotor available from Pololu.com \cite{DC_motor_choice}. The servo motor was a 20kg.cm Metal Gear Servo available from Robotics.org.za \cite{servo_motor_choice}. Finally, the Brushless DC (BLDC) motor was a Quanum 2208 brushless gimbal motor \cite{bldc_motor_choice} available second hand.
+
+The DC motor is relatively long and heavy. It also requires an additional H-bridge circuit to drive it. Finally, it wasn't clear how the Raspberry Pi (running a non realtime OS) would use the rotational decoder and apply a control law.
+
+The servo motor is relatively easy to use as the Raspberry Pi has built in PWM. It also has relatively high torque. However, it too is relatively large and would likely move in a jittery fashion, resulting in lower quality footage.
+
+Lastly, the BLDC motor is potentially expensive and quite complex to use. Its advantages are its was compactness, low weight and high speed. It is worth noting that, while controlling BLDC motors can be fairly complex, using a store-bought controller allows for one to easily leverage off the design work of other engineers. This results in a faster, smoother and more stable gimbal than one could build in a short period of time.
 
 \subsection{\label{ssec:gimbal_design_inspirations}Gimbal design inspirations}
 It is useful to review existing gimbal designs in order to avoid unnecessary re-invention of the wheel. Luckily, a large number of designs are available on the internet. One design which stood out from the research phase was \href{https://www.thingiverse.com}{thingiverse.com} member Velocirotor's clever gimbal design, dubbed the \href{https://www.thingiverse.com/thing:2804872}{Primbal Session} \cite{website:primbal_session}. It is light-weight, simple to 3D print and has an easy method to adjust length to balance the gimbal's three axis. A render of the design can be found in Figure~\ref{fig:primbal_pic}.
