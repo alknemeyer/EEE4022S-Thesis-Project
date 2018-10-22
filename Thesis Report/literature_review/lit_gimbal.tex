@@ -9,38 +9,8 @@ A gimbal is device which can rotate about one or more axis \cite{website:definit
 
 While gimbal designs are \emph{fairly} standard, a few critical design choices must be made when building or buying one.% The rest of this chapter will detail some of the options available.
 
-\subsection{Comparison of actuator types}
+\subsection{Comparison of actuator types}\label{ssec:gimbal_comparison}
 The type of actuator used in the gimbal has a significant effect on the design of the gimbal (due to actuator shape), the speed it can move, the camera weight it can handle and quality of the resulting photos and videos (due to actuator vibrations). Thus, three relevant actuator types (a brushed DC motor, a servomotor and a BLDC motor) were considered and compared, taking into account the selection available at local stores.
-
-%\begin{table}[h!]
-%	\centering
-%	\begin{tabular}{ p{2cm}||p{4cm}|p{4cm}|p{4cm} }
-%					& DC motor			& Servo motor		& BLDC \\
-%	\hline \hline
-%	Length			& $\approx 45mm$	& $\approx 50mm$	& $<30mm$ \\
-%	\hline
-%	Diameter		& $\approx 30mm$	& $50mm\times 20mm$	& $<30mm$ \\
-%	\hline
-%	Weight			& Moderate			& Heavier			& Light, requires ESC \\
-%	\hline
-%	Complexity		& Moderate (H-bridge) & Simple (built in) & Difficult (requires PID controller) \\
-%	\hline
-%	Circuitry required & H-bridge		& None (built in)	& Requires ESCs \\
-%	\hline
-%	Efficiency		& Low				& Low				& High \\
-%	\hline
-%	Maximum speed	& Low				& Low				& High \\
-%	\hline
-%	Price			& Low/moderate		& Low/moderate		& High \\
-%	\hline
-%	Smoothness		& Moderate			& Low				& Very high \\
-%	\hline
-%	\end{tabular}
-%	\caption{Comparison of gimbal actuators}
-%	\label{table:gimbal_actuators}
-%\end{table}
-
-%To summarize the main highlights from table \ref{table:gimbal_actuators}:
 
 To make the comparison more concrete, specific possible models were chosen. The DC (Direct Current) motor considered was 99:1 Metal Gearmotor available from Pololu.com \cite{DC_motor_choice}. The servo motor was a 20kg.cm Metal Gear Servo available from Robotics.org.za \cite{servo_motor_choice}. Finally, the Brushless DC (BLDC) motor was a Quanum 2208 brushless gimbal motor \cite{bldc_motor_choice} available second hand.
 

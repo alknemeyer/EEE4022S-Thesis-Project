@@ -3,7 +3,7 @@
 Computer vision is an extremely large field of study on its own, but only a part of the system being designed. Thus, this section serves more as a light introduction to concepts and intuitions relevant to the project.
 
 \subsection{Basic computer vision concepts}
-Photo-based computer vision techniques tend to be able to differentiate between classes of objects by using a number of cascaded filters, with each layer of filters being able to detect more and more complex shapes in an image \cite{website:cs231n_CNNs}. These filters are known as 'kernels', and tend to be implemented as square matrices which are convolved with the input image, a 2D array of pixel values.
+While photo-based computer vision is a broad field, traditional techniques tend to be able to differentiate between classes of objects by using a number of cascaded filters, with each layer of filters being able to detect more and more complex shapes in an image \cite{website:cs231n_CNNs}. These filters are known as 'kernels', and are implemented as square (or cube) matrices which are convolved with the input image, a 2D (or 3D, for colour) array of pixel values.
 
 As an example, Figure~\ref{fig:input_output_simple_filter} shows a simple image before (left) and after (right) being convolved with a vertical line finding kernel. Code to create this plot can be found in the authors \href{https://github.com/alknemeyer/EEE4022S-Thesis-Project/blob/master/Final%20code/Illustrations%20for%20report.ipynb}{GitHub repository}.
 
@@ -66,19 +66,21 @@ CNNs are initialized with random values in their kernels and random values for t
 \begin{enumerate}
 \item Initialize the CNN with a set structure and random weights.
 \item Pass an image through the CNN, and take note of the output.
-\item Get the error (the difference between the CNN output and the correct answer) and propagate it back through the CNN, adjusting the weights \emph{slightly} in such a way that that same input would be more likely to produce the correct output if run again. This is known as 'backpropagation'.
+\item Get the error (the difference between the CNN output and the correct answer) and propagate it back through the CNN (known as 'backward propagation', or 'backpropagation'), adjusting the weights \emph{slightly} in such a way that that same input would be more likely to produce the correct output if run again (this is known as 'gradient descent', as it makes use of the partial derivative of each neurons computation to calculate how the weights should be adjusted).
 \item Repeat the first three steps a few hundred or thousand times until the performance stops increasing. It is helpful to use a large dataset consisting of a diverse set of images.
 \end{enumerate}
 
-This process is known as 'training'. An illustration of the backwards propagation is shown in Figure~\ref{fig:backprop_nn}. Differentiation is used to calculate the how the weights should be modified in order to decrease future errors.
+This process is known as 'training'. An illustration of the backwards propagation is shown in Figure~\ref{fig:backprop_nn}.
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\textwidth]{literature_review/backprop_nn}
+  \includegraphics[width=0.7\textwidth]{literature_review/backprop_nn}
   \caption{\label{fig:backprop_nn}An illustration showing inference (forward propagation) and error minimization (backward propagation) in a neural network \cite{website:backprop_img}. Each circle represents a computation (or neuron).}
 \end{figure}
 
-While it is possible that the CNN will act as an inefficient look-up table (mapping those specific inputs to their correct outputs, but giving the wrong result for a new image which it hasn't been exposed to \cite{werbos1974beyond} it is hoped that the CNN will instead map any \emph{similar} input to the correct output. As an example, a correct training CNN will map any image which \emph{looks} like a cheetah (has the correct body structure, spots, ear location, etc) to an output which is numerically encoded to represent "cheetah". The process of taking an input and producing an output is known as 'inferencing'.
+While it is possible that the CNN will act as an inefficient look-up table (mapping those specific inputs to their correct outputs, but giving the wrong result for a new image which it hasn't been exposed to \cite{werbos1974beyond} it is hoped that the CNN will instead map any \emph{similar} input to the correct output. As an example, a correctly trained CNN will map any image which \emph{looks} like a cheetah (has the correct body structure, spots, ear location, etc) to an output which is numerically encoded to represent "cheetah", even if it hasn't seen that particular image before. The process of taking an input and producing an output is known as 'inference'.
+
+It should be noted that CNNs are nothing more than a nonlinear mapping from a vector of input pixels (the image) to a vector which represents certain outputs (where, for example, the first element in the vector represents "cheetah" as 1, "no cheetah" as 0, or even the coordinates of a cheetah. The second element could represent "hotdog" or "no hotdog", and so on. This is known as 'one hot encoding' \cite{website:one_hot_encoding}). Thus, in essence, this entire process is the solution to an optimisation problem: how to find the best set of weights to correctly map an input to the correct output.
 
 \begin{figure}[h!]
   \centering
@@ -86,13 +88,12 @@ While it is possible that the CNN will act as an inefficient look-up table (mapp
   \caption{\label{fig:one_hot_encoding}An illustration of one hot encoding. In this example, a value near one in the first index of the vector indicates a high likelihood of the image containing a cheetah.}
 \end{figure}
 
-It should be noted that CNNs are nothing more than a mapping from a vector of input pixels (the image) to a vector which represents certain outputs (where, for example, the first element in the vector represents "cheetah" as 1, "no cheetah" as 0, or even the coordinates of a cheetah. The second element could represent "hotdog" or "no hotdog", and so on \cite{website:one_hot_encoding}). Thus, in essence, this entire process is the solution to an optimisation problem: how to find the best set of weights to correctly map an input to the correct output.
 
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.8\textwidth]{literature_review/img_to_result}
-  \caption{\label{fig:img_to_result}A highly abstracted view of a CNN.}
-\end{figure}
+%\begin{figure}[h!]
+%  \centering
+%  \includegraphics[width=0.8\textwidth]{literature_review/img_to_result}
+%  \caption{\label{fig:img_to_result}A highly abstracted view of a CNN.}
+%\end{figure}
 
 CNNs simply require a few hundred or thousand labelled images and a few hours on a modern GPU, depending on the hardware and datasets available \cite{website:fastai_train_times}. There are many tips, tricks and open datasets which can be used to make this work easier.
 
@@ -107,7 +108,7 @@ To illustrate this with a topical example, a data scientist might create a CNN w
 
 Since the project at hand doesn't necessitate a brand new architecture, the latter group is what will be focused on. Thus, only a few ideas need to be discussed.
 
-\subsubsection{General terminology}
+%\subsubsection{General terminology}
 
 \textit{Machine learning, neural networks, deep learning, CNNs}: machine learning is the branch of computer science involved in fitting a model using data~\cite{kohavi1998glossary}. Neural networks are a subset of machine learning, specifying a class of architectures loosely inspired by the synapses in the nervous system of an organic brain~\cite{hopfield1988artificial}. Deep learning is the relatively recent practice of creating especially long neural networks in order to represent more complex mappings~\cite{schmidhuber2015deep}. Finally, CNNs are a subset of deep learning, in which the synapses of a deep neural network are kernels which perform convolution operations~\cite{website:cs231n_CNNs}.
 

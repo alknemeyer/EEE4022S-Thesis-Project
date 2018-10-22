@@ -1,11 +1,11 @@
 \chapter{Recommendations}
 
-There are a number of alternative ideas and approaches which merit investigation, instead of the methodology used as part of this study. The ideas were left unimplemented as they were realised too late in the process or would have required too much time or money.
+There are a number of alternative ideas and approaches which merit investigation. The ideas were left unimplemented as they were realised too late in the process or would have required too much time or money.
 
-The list of future recommendations is thus as follows:
+The list of future recommendations is as follows:
 
 \begin{enumerate}
-	\item Instead of tracking the state of the object in angles, try instead tracking it as a an absolute position on a plane surrounding the tracker. This would either require a depth estimating neural network, or a distance sensor which works even when the system doesn't aim directly at the object.
+	\item Instead of tracking the state of the object as an angle, try instead track it as an $(x,~y)$ position on a plane surrounding the tracker. This would either require a depth estimating neural network or a distance sensor which works even when the system doesn't aim directly at the object.
 	\item Get a camera, computer and neural accelerator which decrease the total sensing latency.
 	\item Consider adding an encoder to the gimbal to avoid built up gyroscope drift when an accelerometer axis lines up with with a rotation axis.
 	\item Consider switching the main programming language from python to something faster and better oriented to parallelism. The language could also be low-level, now that most of the debugging and prototyping has already been done.

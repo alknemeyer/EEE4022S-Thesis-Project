@@ -1,12 +1,12 @@
-\chapter{Control Loop Design and Implementation}
+\chapter{Control Loop Design and\\Implementation}
 This chapter details the process of combining the project components mentioned in previous chapters. This was surprisingly non-trivial due to the high latency of the object detector and need for parallelization.
 
 \section{Description of software implementation}
-The main negative consequence of choosing a CNN for object detection is the latency introduced by the long inference time. This influenced the system design to a great extent. In addition, the unexpectedly long time required to get a photo from the Pi camera and preprocess it added to the list of compute-intensive latency-causing components. Thus, it was decided that the system would require the use of multiprocessing and message passing, made possible and simple through the use of python's built in \pyth{multiprocessing} module.
+The main negative consequence of choosing a CNN for object detection is the latency introduced by the long inference time. This influenced the system design to a great extent. In addition, the unexpectedly long time required to get a photo from the Pi camera and preprocess it added to the list of compute-intensive latency-causing components. Thus, it was decided that the system would make use of multiprocessing and message passing, made possible and simple through the use of python's built in \pyth{multiprocessing} module.
 
-This helped in two ways: the first is that it freed the main process to continuously send commands to the gimbal using the (sometimes predicted) results of the KF. It would simply not be tolerable to be out of this loop for 200ms or more while a photo is taken and the result inferred.
+This helped in two ways: the first is that it freed the main process to continuously send commands to the gimbal using the estimate from the KF. It would simply not be tolerable to be out of this loop for 200ms or more while a photo is taken and the result inferred.
 
-The second advantage is that while implementing a parallel data pipeline would increase the overall latency between a photo being taken and the result being used, the final number of readings per second actually increases. This is because while one process takes a photo, another can simultaneously infer the image while the parent process communicates with the gimbal controller.
+The second advantage is that while implementing a parallel data pipeline would increase the overall latency between a photo being taken and the result being used, the number of readings per second actually increases. This is because while one process takes a photo, another can simultaneously infer the image while the parent process communicates with the gimbal controller. This meant that a single faulty or missing measurement would quickly be replaced by a new one.
 
 Thus, data was passed from one process to the next using parallel processing Queues. A block diagram of this and the other components in the pipeline is shown in Figure~\ref{fig:system_block_diagram}.
 
@@ -25,22 +25,22 @@ In the photo stage, a child process would interface with the Raspberry Pi camera
 In the inference stage, another child process interfaced with the Movidius NCS. It received the preprocessed images from the previous stage and loaded them onto the neural accelerator. While waiting for the inference result, it would occasionally save a copy of the photo to disk for offline debugging purposes. Once it received the result, it would decode the neural net output, put it and the photo time into an easy to use python dictionary and place it in a final buffer. Again, this needed to be in a separate process as the total time required to pass an image to the NCS and then infer a result was about 100ms.
 
 \subsection{The main process}
-While this was happening, the main parent process continuously runs a control loop which receives the results from the inference process, and uses it to update two Kalman Filters which track the object's pitch and yaw states. It also communicates with the gimbal controller using its serial API. Lastly, it logs relevant data for debugging purposes.
+While this was happening, the main parent process continuously ran a control loop which received the results from the inference process, and used it to update two Kalman Filters which track the object's pitch and yaw states. It also communicated with the gimbal controller using its serial API. Lastly, it logged relevant data for debugging purposes.
 
 
 
 \section{Fixing timing issues}
 The large latency in the object detection caused further problems which needed to be fixed. These problems and their solutions are described in the following subsections.
 
-\subsection{Kalman Filter timing issues}
+\subsection{Inference result/gimbal state timing issues}
 Recall that the neural network can only give a relative angle between the camera and the object, while the gimbal works using absolute angles with respect to some initial position.
 
 The Kalman Filters, each tracking the absolute angular states of the object, would need to be passed the results from the neural network as absolute angles. This could be done by reading requesting the gimbal to send its angular position at the time that the photo was taken. \\
 
 \begin{python}
-gc_angles = gc.get_motor_angles()
-KF_yaw.update(phi_yaw + gc_angles['yaw'])
-KF_pitch.update(phi_pitch + gc_angles['pitch'])
+camera_angle = gc.get_motor_angles()
+KF_yaw.update(angle_to_object_yaw + camera_angle['yaw'])
+KF_pitch.update(angle_to_object_pitch + camera_angle['pitch'])
 \end{python}
 
 However, this presented a new problem to be solved - the angular state of the camera at the time that the photo was taken usually significantly different by the time the result had been inferred due to the large latency in the inference.
@@ -53,17 +53,26 @@ However, this presented a new problem to be solved - the angular state of the ca
 The solution was to keep a rolling buffer of a few gimbal angle readings, and then use the angle measurement at the time closest to the photo time to properly convert the neural network measurement from a relative angle to a global one. The snippets of code relevant to this are shown below. \\
 
 \begin{python}
-# current time, put into rolling buffer
-gc_logger_time[gc_i % gc_logger_len] = time.time()
+# gc_angles is the dictionary returned from gc.get_motor_angles()
+def log(self, gc_angles):
+	self.time_buffer[self.idx % self.buffer_len] = time.time()
+	self.yaw_buffer[self.idx % self.buffer_len] = gc_angles['yaw']
+	self.pitch_buffer[self.idx % self.buffer_len] = gc_angles['pitch']
+	self.idx += 1
 
-# gimbal angle at current time
-gc_logger_yaw[gc_i % gc_logger_len] = gc_angles['yaw']
-gc_i += 1
+def angle_closest_to(self, photo_time):
+    # index of time closest to the photo time
+    idx = np.argmin(np.abs(self.time_buffer - photo_time))
+    return self.yaw_buffer[idx], self.pitch_buffer[idx]
 
-# later on...
-# index of the logger time closest to the photo time
-idx = np.argmin(np.abs(gc_logger_time - photo_time))
-KF_yaw.update(phi_yaw + gc_logger_yaw[idx])
+# log angle of gimbal
+gimbal_buffer.log(gc.get_motor_angles())
+
+# later on, when a result arrived from the neural network:
+obj_yaw, obj_pitch, photo_time = get_angles_and_photo_time_from_nn()
+logger_yaw, logger_pitch = gimbal_buffer.angle_closest_to(photo_time)
+EKF_yaw.update(obj_yaw + logger_yaw)
+EKF_pitch.update(obj_pitch + logger_pitch)
 \end{python}
 
 Another reason why this approach was necessary was because the time between taking a photo and getting the result was non-constant.
@@ -74,14 +83,14 @@ Given that the KF in the gimbal was working correctly, there were two options fo
 \begin{enumerate}
 \item $t = 0$: photo taken and inference started.
 \item $t = 200ms$: result received for for $t=0$. By this time, the object has moved slightly.
-\item Two options:
+\item Two options to move the gimbal at $t=200ms$:
 	\begin{itemize}
-	\item Use estimate from $t=0$
-	\item Use KF to predict from $t=0$ to $t=200ms$
+	\item Use the KF estimate using measurements from $t\le0$.
+	\item Use the KF to predict from $t=0$ to $t=200ms$
 	\end{itemize}
 \end{enumerate}
 
-The first approach was to track the KFs estimate of the object at all times. Since the KFs receive all data with a roughly $\approx 200ms$ delay, the resulting system would essentially track the position of tracked object $200ms$ after in the past. This approach accepts the fact that the camera will usually not aim at the camera but instead lag a few degrees behind it (depending on the angular velocity of the object).
+The first approach was to track the KFs estimate of the object at all times. Since the KFs receive all data with a roughly $\approx 200ms$ delay, the resulting system would essentially track the position of tracked object $200ms$ in the past. This approach accepts the fact that the camera will usually not aim at the camera but instead lag a few degrees behind it (depending on the angular velocity of the object).
 
 The second approach would be to use the KF estimate of the angular state of the object to 'predict' from the KF's $\approx 200ms$ lagging time into the actual live time. If successful, the camera would perfectly track the position of the object as it moves along. However, there is no guarantee that the KF prediction will match the actual movements of the object. Thus, this approach would be prone to things like extreme overshoot every time the object slowed down or turned around.
 
@@ -89,7 +98,7 @@ There is merit to both approaches - the first is more robust, with worse camera 
 
 
 \section{Benchmarking the flow of data}
-Due to the non real time OS, timing each part of the data pipeline resulting in varying results. What follows are average timed values:
+Due to the non real time OS on the Raspberry Pi, timing each part of the data pipeline resulting in varying results. What follows are average timed values:
 
 \begin{itemize}
 \item Time to take a photo: 40 - 120 ms.
@@ -101,4 +110,4 @@ Due to the non real time OS, timing each part of the data pipeline resulting in 
 
 There were also synchronization issues wherein the time between one process placing data in a queue and it being fetched by the next process was not negligible.
 
-In total, the time from photo to results was usually 250 - 350ms
+In total, the time from photo to results was usually 200 - 300ms

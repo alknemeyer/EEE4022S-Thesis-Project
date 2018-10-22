@@ -6,7 +6,7 @@ This chapter describes the steps required to establish a complete computer-visio
 
 Following this, the actual implementation of the computer vision system is discussed along with some short tests on its performance.
 
-It should be noted that a lot of mistakes were made in this part of the project - these won't be discussed.
+%It should be noted that a lot of mistakes were made in this part of the project - these won't be discussed.
 
 \section{Workstation setup and testing}
 Three independent computers were used as part of the complete computer vision workflow - a mid-range GPU-equipped computer to prototype and train neural networks, a regular laptop to test and compile a trained neural network and an small embedded computer which uses the neural accelerator for inferencing.
@@ -16,7 +16,7 @@ One software package common among all three computer was git \cite{git}, which w
 \subsection{Setting up a computer for training}
 Depending on the selection of computer vision/deep learning framework and the operating system on which it is installed, setting up a computer to train neural networks can range from trivial to extremely difficult. However, there are some commonalities amongst the popular frameworks.
 
-The first step is usually to install CUDA, a GPU-acceleration software developed by NVIDIA for NVIDIA GPUs \cite{nvidia_cuda}. At the time of writing, most frameworks simply don't support AMD GPUs. Next, install cuDNN, NVIDIA software specifically aimed at increase performance for deep neural networks \cite{nvidia_cudnn}.
+The first step is usually to install CUDA, a GPU-acceleration software developed by NVIDIA for their GPUs \cite{nvidia_cuda}. At the time of writing, most frameworks simply don't support AMD GPUs. Next, install cuDNN, NVIDIA software specifically aimed at increasing performance for deep neural networks \cite{nvidia_cudnn} on their GPUs.
 
 If needed for the deep learning framework, install an appropriate version of python \cite{python}.
 
@@ -27,13 +27,13 @@ The first two were TensorFlow and Keras. These are installed using pip, pythons 
 
 The last package was Caffe. Installation on Windows is difficult due to a lack of support for the OS, and wasn't accomplished during the course of the project.
 
-It should be noted that, if the network will simply be fine-tuned (ie, the network was already trained on a similar dataset) then one might actually get away with training the network on a fast CPU.
+It should be noted that, if the network will simply be fine-tuned (ie, the network was already trained on a similar dataset and requires minimal further training) then one might actually get away with training the model on a fast CPU.
 
 
 \subsection{Setting up a computer for testing and compiling}
 Most simple tests were run on an easily accessible computer. If using the Movidius NCS, this computer must run a Ubuntu 16.04 as it is the only non-Raspbian desktop OS the Movidius SDK officially supports \cite{website:movidius_install}. Movidius software barely works as is, so it is not recommended to push things even further by messing around with any other OS.
 
-One option is to run Ubuntu on a virtual machine, such as Oracle VirtualBox. If you do this, don't try to make it work with the NCS - it can be quite tricky getting the drivers to work. Instead, trust that the compiled network will perform as well on the NCS as it does in the uncompiled framework-specific format and save yourself a lot of time.
+One option is to run Ubuntu on a virtual machine, such as Oracle VirtualBox. If you do this, don't bother trying to make it work with the NCS hardware through the VM - it can be quite tricky getting the drivers to work. Instead, trust that the compiled network will perform as well on the NCS as it does in the uncompiled framework-specific format and save yourself a lot of time.
 
 Next, install the Movidus SDK, as described in the documentation \cite{website:movidius_install}. Despite what the documentation suggests, there isn't a need to \pyth{make} all the examples - this can take a couple hours, use a lot of disk space and not help at all.
 
@@ -59,11 +59,11 @@ Interestingly, it is not actually necessary to install any deep learning framewo
 
 Thus, it is \emph{highly} recommended to instead skip all of these potential issues and rather just install the Movidius SDK in API-only mode \cite{movidius_api_only}. This doesn't take long and is not prone to failure.
 
-Python notebooks were used for all actual programming. In this project, the main advantage to using notebooks was the fact that the notebook server could be port-forwarded to the development PC, allowing for far easier plotting and visualisation than would be possible using a simpler IDE in a terminal. It was important that the code ran on the Raspberry Pi itself to access its hardware.
+Python notebooks were used for all actual programming. In this project, the main advantage to using notebooks was the fact that the notebook server could be port-forwarded to the main development PC, allowing for far easier plotting and visualisation than would be possible using a simpler IDE in an SSH terminal. Note that was important that the code ran on the Raspberry Pi itself to access its hardware, and connect the Pi to an external display would not be ideal as its GPU was needed for other computation.
 
 
 \section{Selection of computer vision framework}
-At the time of writing, the Movidius NCS only supports the TensorFlow and Caffe machine learning frameworks \cite{website:movidius_install}. Based largely on its popularity and ease of use, TensorFlow was chosen as the architecture which would be used for the project \cite{website:tensorflow_popularity}. However, TensorFlow is quite low-level and provides fairly slow and convenient methods of model creation, training and testing. It certainly has advantages but ease of development is not one of them.
+At the time of writing, the Movidius NCS only supports the TensorFlow and Caffe machine learning frameworks \cite{website:movidius_install}. Based largely on its popularity and ease of use, TensorFlow was chosen as the architecture which would be used for the project \cite{website:tensorflow_popularity}. However, TensorFlow is quite low-level and provides fairly slow and inconvenient methods of model creation, training and testing. It certainly has advantages but ease of development is not one of them.
 
 To combat this, another option is to instead use Keras, a deep learning library which provides a far more intuitive interface. It allows the user to specify which backend they'd like to use for the actual number crunching. Among other options, one of the available backends is TensorFlow. The popularity of Keras has grown to such an extent TensorFlow has incorporated it as an official API.
 
@@ -72,10 +72,10 @@ The plan was then to retrain a neural network (possibly after modifying it) usin
 However, after far, far too much frustration, it was discovered that the support for each framework was far from equal. Networks created in TensorFlow quite consistently failed to compile. After examining the Movidius documentation more closely, it was discovered that the number of operations supported for TensorFlow was simply far smaller than the number supported for Caffe. For instance, the TensorFlow \pyth{concat} operation doesn't appear on the list of compilable operations. This left Caffe as the only other available framework.
 
 \section{Selection of CNN architecture}
-By this stage, the work spent on object detection had exceeded time estimates and was threatening to compromise the time available for the other components in the system. In addition, Caffe has extremely poor support for Windows machines and no GPU-enabled Linux PC was available for use. For these reasons, it was decided the an unmodified pretrained Caffe model would be used.
+By this stage, the work spent on object detection had exceeded time estimates and was threatening to compromise the time available for the other components in the system. In addition, Caffe has extremely poor support for Windows machines and no there were no dedicated GPU-enabled Linux PC was available for use as a neural network training machine. For these reasons, it was decided the an unmodified pretrained Caffe model would be used.
 
 %https://github.com/movidius/ncappzoo/tree/master/caffe
-In order to mitigate further risk of a model not working correctly on the NCS, only architectures with official support from Movidius were considered. At the time, this narrowed the choice down to a single realistic option: SSD MobileNet, the combination of MobileNet and SSD, two independently designed neural network architectures.
+In order to mitigate further risk of a model not working correctly on the NCS, only architectures with official support from Movidius were considered. At the time, this narrowed the choice down to a single option: SSD MobileNet, the combination of MobileNet and SSD, two independently designed neural network architectures.
 
 MobileNet is a class of image classifiers designed by researchers at Google \cite{arXiv:1704.04861}. Since it was designed for mobile devices, it trades some classification accuracy for performance. However, the architecture is remarkable in that the performance increase is usually significant while the classification accuracy decrease is not. It acts a feature extractor in this particular model.
 
@@ -93,46 +93,45 @@ For the sake of convenience and low latency imaging, it was decided that a Raspb
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.5\textwidth]{methodology/r_pi_camera}
-  \caption{\label{fig:r_pi_camera} UPDATE ME.}
+  \caption{\label{fig:r_pi_camera}A photo of a Raspberry Pi connect to a Raspberry Pi camera module.}
 \end{figure}
 
 An alternative would be to attempt to stream from the GoPro cameras themselves, but this would result in a higher latency as the photos have to be transferred via WiFi and would not use the Pi's built in hardware encoding \cite{website:gopro_to_rpi, website:gopro_to_rpi2}.
 
 As described in the excellent \pyth{picamera} module documentation \cite{website:picamera_hardware}, one must be careful about selecting a sensor mode and camera resolution which makes use of the full FOV available (62.2\textdegree $\ \times$ 48.8\textdegree). Lower resolutions and fast sensor modes tend to take a simple crop of the centre of the image (reducing the FOV) instead of taking a full photo and resizing it. The price paid for this is latency - the higher the resolution, the more data flows through the pipeline and computation must be done.
 
-A resolution of \pyth{1640 x 1232} maximised the FOV. Since the Pi Cameras sensor resolution is \pyth{3280 x 2464}, it uses 2$\times$2 binning to easily achieve this downscaling. Next, the Pis GPU was used to easily resize the image down to \pyth{320 x 304} - only a few resolutions are support by the library and this one was close to the resolution used by neural networks, so further resizing on the Pis CPU would require minimal processing time.
+A resolution of \pyth{1640 x 1232} maximised the FOV. Since the Pi Cameras sensor resolution is \pyth{3280 x 2464}, it uses 2$\times$2 binning to easily achieve this downscaling. Next, the Pis GPU was used to easily resize the image down to \pyth{320 x 304} - only a few resolutions are support by the library and this one was close to the resolution typically used by CNNs, so further resizing on the Pis CPU would require minimal processing time.
 
 Finally, the video port was used to take photos instead of the camera. This was done to decrease latency - while both the video port and still port constantly send photos down the ribbon cable to the pi, using the video port results in less anti-noise post-processing (and thus lower latency).
 
-As is normal in Python, once the exact problem had been understood, the solution in code was relatively straightforward. The code below is enough to set up the pipeline mentioned thus far: \\
+%As is normal in Python, once the exact problem had been understood, the solution in code was relatively straightforward. The following code is enough to set up the pipeline mentioned thus far: \\ \\ \\ \\
 
-\begin{python}
-with picamera.PiCamera(resolution=(1640, 1232),
-                       framerate=40,
-                       sensor_mode=5) as camera:
-     # (320, 304) is closest to neural network input of (300,300)
-    frame = picamera.array.PiRGBArray(camera,
-                                      size=(320, 304))
-    # use GPU for resizing - will resize to nn_shape later
-    cont_capture = camera.capture_continuous(frame, 'rgb',
-                                             resize=(320, 304),
-                                             use_video_port=True)
-\end{python}
+%\begin{python}
+%with picamera.PiCamera(resolution=(1640, 1232),
+%                       framerate=40,
+%                       sensor_mode=5) as camera:
+%     # (320, 304) is closest to neural network input of (300,300)
+%    frame = picamera.array.PiRGBArray(camera,
+%                                      size=(320, 304))
+%    # use GPU for resizing - will resize to nn_shape later
+%    cont_capture = camera.capture_continuous(frame, 'rgb',
+%                                             resize=(320, 304),
+%                                             use_video_port=True)
+%\end{python}
 
-After this, a simple function call of \pyth{next(cont_capture)} would fetch the latest frame from the continuous stream of photos, perform some post-processing and then place it in the \pyth{frame} buffer, where it could be accessed using \pyth{frame.array}.
+%After this, a simple function call of \pyth{next(cont_capture)} would fetch the latest frame from the continuous stream of photos, perform some post-processing and then place it in the \pyth{frame} buffer, where it could be accessed using \pyth{frame.array}.
 
 \subsection{Compiling a trained neural network}
-A trained SSD MobileNet was found on GitHub user chuanqi305's \href{https://github.com/chuanqi305/MobileNet-SSD}{online git repo}. It has an input dimension of $300 \times 300 \times 3$, and was largely trained on MS-COCO before being fine-tuned on VOC0712 (MS-COCO and VOC0712 are two large, freely available datasets). It was trained to predict make predictions for 20 classes, including 'person', 'dog' and 'cat'. The reason for choosing a network which predicted these classes, was because tests would be done on (easily accessible) humans and dogs. In addition, if the network was to be retrained to detect cheetahs, starting from detecting cats or dogs might help decrease training time and the amount of data required.
+A trained SSD MobileNet was found on GitHub user chuanqi305's \href{https://github.com/chuanqi305/MobileNet-SSD}{online git repository} \cite{website:chuanqi305_nn_github}. It has an input dimension of $300 \times 300 \times 3$, and was largely trained on MS-COCO before being fine-tuned on VOC0712 (MS-COCO and VOC0712 are two large, freely available datasets \cite{website:mscoco_dataset, website:voc2012_dataset}). It was trained to predict make predictions for 20 classes, including 'person', 'dog' and 'cat'. The reason for choosing a network which predicted these classes, was because tests would be done on (easily accessible) humans and dogs. In addition, if the network was to be retrained to detect cheetahs, starting from detecting cats or dogs might help decrease training time and the amount of data required.
 
 After confirming that the license for usage of the model is permissive, it was downloaded and then compiled on a windows laptop running an Ubuntu VM with the full Movidius SDK installed, using the \pyth{mvNCCompile} command. The graph file was then transferred to the Raspberry Pi via an ssh terminal.
 
 Using Movidius code from tutorials as a starting point, the graph file was uploaded to the NCS. The camera module presented above was then used to take a photo and store it as an array of unsigned 8-bit integers (integers from 0 to 255).
 
-The CNN used required some preprocessing before and image could be passed in as an input. Specifically, the images should be represented as an array of floats with a mean of 0 and a range of $(-1, +1)$. This was done using the calculation,\\
+The CNN used required some preprocessing before an image could be passed in as an input. Specifically, the images should be represented as an array of floats with a mean of 0 and a range of $(-1, +1)$. This was done using the calculation,%\\ \\
 
 \begin{python}
-# 255/2 == 127.5
-mean = (127.5, 127.5, 127.5)  # 3 colour channels
+mean = (127.5, 127.5, 127.5)  # 3 colour channels, 255/2 == 127.5
 scale = 1/127.5
 preprocessed_img = (img - np.float32(mean)) * np.float32(scale)
 \end{python}
@@ -164,7 +163,7 @@ First, a photo of the author's dog was tested. The network correctly predicted '
   \caption{\label{fig:box_around_blossom}A photo of the authors dog, correctly predicted with 99\% confidence.}
 \end{figure}
 
-Next, three images of the author were tested. The first two are shown in Figures~\ref{fig:box_around_me_crouching} and \ref{fig:box_around_me_running}.
+Next, three images of the author were tested. They are shown in Figures~\ref{fig:box_around_me_crouching}, \ref{fig:box_around_me_running} and Figure~\ref{fig:box_around_people_hard}.
 
 \begin{figure}[h!]
     \centering
@@ -174,9 +173,9 @@ Next, three images of the author were tested. The first two are shown in Figures
     \caption{Photos of the author looking silly while moving around a laboratory.}
 \end{figure}
 
-Figures~\ref{fig:box_around_me_crouching} and \ref{fig:box_around_me_running} show that the neural network can correctly classify objects in non-standard positions (such as when the classified object is in a crouch position, or from the side) in relatively complex environments, such as a laboratory with textured brick walls. The camera was moved slightly during both of the photos, resulting in slightly blurred images. The confidence ratings were 88\% and 96\% respectively.
+Figures~\ref{fig:box_around_me_crouching} and \ref{fig:box_around_me_running} show that the neural network can correctly classify objects in non-standard positions (such as when the classified object is in a crouch position, or from the side) in relatively complex environments, such as a laboratory with textured brick walls. The camera was moved slightly during both of the photos, resulting in slightly blurred images. This was done to emulate the gimbal moving the camera system. The confidence ratings were 88\% and 96\% respectively.
 
-The final image, shown in Figure~\ref{fig:box_around_people_hard}, was a bit of a surprise in that the network far surpassed the authors expectations. Two people were correctly identified: a woman at a desk in the left of the frame with a confidence of 93\%, and the bottom two thirds of the author on the right side with a confidence of 91\%. Faces have been one of the easiest things to detect in computer vision \cite{website:face_detection_survey}, so it was a pleasant surprise to find that the network doesn't need a face at all.
+The final image, shown in Figure~\ref{fig:box_around_people_hard}, was a bit of a surprise in that the network far surpassed the authors expectations.
 
 \begin{figure}[h!]
   \centering
@@ -184,12 +183,16 @@ The final image, shown in Figure~\ref{fig:box_around_people_hard}, was a bit of 
   \caption{{\label{fig:box_around_people_hard}A photo of a person sitting and the bottom two thirds of another person standing, correctly predicted with 93\% and 91\% confidence respectively.}}
 \end{figure}
 
-There was also a false-positive detection in the centre of the frame. However, the confidence for this detection was 38\% - low enough that the recommended confidence threshold of 0.7 would have ignored it.% \\
+Two people were correctly identified: a woman at a desk in the left of the frame with a confidence of 93\%, and the bottom two thirds of the author on the right side with a confidence of 91\%. Faces have been one of the easiest things to detect in computer vision \cite{website:face_detection_survey}, so it was a pleasant surprise to find that the network doesn't need a face at all.
+
+There was also a false-positive detection in the centre of the frame. However, the confidence for this detection was 38\% - low enough that the recommended confidence threshold of 70\% confidence \cite{website:chuanqi305_nn_github} would have resulted in it being ignored.% \\
 
 \subsection{Observed performance increase due to NCS}\label{ssec:meth_nn_performance_increase}
-Next, the performance increase of the NCS was tested to confirm that the device was in fact necessary. For the purposes of the tests, the pre-processing time and latency of the camera were ignored. It is worth noting that there will always be variability when timing the runtime of a process on a non-realtime OS using a language which occasionally pauses for garbage collection.
+Next, the performance increase of the NCS was tested to confirm that the device was in fact necessary. For the purposes of the tests, the pre-processing time and latency of the camera were ignored as they are common to all methods of inferencing. It is worth noting that there will always be variability when timing the runtime of a process on a non-realtime OS using a language which occasionally pauses for garbage collection.
 
-First, the Pi was tested on its own. Using the CPU, roughly a full second was required to get from pre-processed image to serialized results. Due to multithreading, up to four images may be processed side by side for a total of 4 Hz with a latency of 1 second.
+First, the Pi was tested on its own. Using the CPU, roughly a full second was required to get from pre-processed image to serialized results. Due to multithreading, up to four images may be processed side by side (staggered 250ms apart) for a total sampling rate of 4 Hz with a latency of 1 second.
 
 Next, the Pi was tested with the Movidius NCS. It took around 20 ms to send the image to the devices memory, and then around 80ms to receive the result. The NCS can't process multiple images simultaneously, so this equated to a speed of 10 Hz with a latency of 100ms.
+
+This proved that, short of using another form of CNN acceleration, the NCS was vital to the project's success.
 

@@ -1,8 +1,8 @@
 \chapter{The Gimbal}
-Once an object has been found and a desired control action calculated, the camera must be rotated so as to track it. This required the use of a camera gimbal which is powerful enough to rotate the payload specified by the researchers who will ultimately use the system: two GoPro Hero Session cameras, a distance sensor and the small camera used for tracking. Since no system was available which supports this payload, a new gimbal had to be designed and built.
+Once an object had been found and a desired control action calculated, the camera needed to be rotated so as to track it. This required the use of a camera gimbal which is powerful enough to rotate the payload specified by the researchers who will ultimately use the system: two GoPro Hero Session cameras, a distance sensor and the small camera used for tracking. Since no system was available which supports this payload, a new gimbal had to be designed and built.
 
 \section{The gimbal frame}
-There are already a number of gimbal systems available for purchase, and gimbal designs available for free use. However, the requirements of the gimbal narrowed down the options significantly. Gimbals typically need only keep a single small camera level, or rotate according to commands from an RC system. This project requires a gimbal which has space for two cameras spaced a few centimetres apart and can rotate according to commands from a Raspberry Pi. This necessitated the design of a new system.
+There are already a number of gimbal systems available for purchase, and gimbal designs available for free use. However, the requirements of the gimbal narrowed down the options significantly. Gimbals typically need only keep a single small camera level, or rotate according to commands from an RC system. This project required a gimbal which has space for two cameras spaced a few centimetres apart and can rotate according to commands from a Raspberry Pi. This necessitated the design of a new system.
 
 While they couldn't be used without modification, the designs mentioned subsection \ref{ssec:gimbal_design_inspirations} were a good enough reference point that a new system could be created with relative ease.
 
@@ -55,7 +55,7 @@ It was decided that the 2-axis mode would be used for tests: this way, the gimba
     \caption{\label{fig:photo_of_gimbal}A photo of the 3D printed and assembled gimbal.}
 \end{figure}
 
-Four LD-Power 2208 gimbal motors were used, mainly because they included in the purchase of the second hand gimbal controller. Due to the small market for gimbals, they are simply rewound high-speed quadcopter/airplane motors, made to work at lower speeds with higher torque \cite{website:rewinding_bldc_gimbal}.
+Four LD-Power 2208 BLDC gimbal motors were used, based on the comparison in Subsection \label{ssec:gimbal_comparison} and because they were available second hand at a good price. Due to the small market for gimbals, they are simply rewound high-speed quadcopter/airplane motors, made to work at lower speeds with higher torque \cite{website:rewinding_bldc_gimbal}.
 
 \section{The gimbal controller}
 Properly controlling BLDC motors to stabilize a gimbal is an entire project on its own. Luckily, there are well-designed existing products which easily fulfil the requirements needed. While research was made into the strengths and weakness of the various options available, factors such as local availability, price and time until reception of the gimbal resulted in a single actual choice: purchasing a second hand BaseCam Electronics Simple Brushless Gimbal Controller (SBGC) 32-bit controller \cite{website:basecam_sbgc} from someone who used it for drone footage.
@@ -70,9 +70,9 @@ It also has an entire serial API which allows an external computer to write comm
 
 The controllers serial API is specified in a 53 page document \cite{website:sbgc_serial_api}. The manufacturer also provides an Arduino implementation of the serial API. However, since the rest of the project was implemented in python, it was decided that the relevant communication protocol would be re-implemented in python. In addition, since a variety of users on the BaseCam forums have mentioned that they would appreciate having access to such a python module, the library will be released for free on the forums. It can be found on the authors \href{https://github.com/alknemeyer/EEE4022S-Thesis-Project/blob/master/Final%20code/gimbal_control.ipynb}{GitHub repository.}
 
-The serial API was made to work by looking through the specification, reading the code in the Arduino implementation and finally visualising the output of the Raspberry Pi using an oscilloscope as a last resort debugging technique.
+The serial API was made to work by looking through the specification, reading the code in the Arduino implementation and finally visualising the serial output of the Raspberry Pi using an oscilloscope as a last resort debugging technique.
 
 \subsection{Tuning the controller}
-The gimbal controller offered an 'auto-PID' tuning algorithm, but for known reasons this didn't work very well. Thus, the controller was tuned manually by first adjusted the Proportional term until a fast response was achieved, then the Integrator term until the system began oscillating, and then finally the Derivative term until the overshoot stopped. Then, each term was tweaked until a smooth yet robust response was achieved.
+The gimbal controller offered an 'auto-PID' tuning algorithm, but for unknown reasons this didn't work very well. Thus, the controller was tuned manually by first adjusting the Proportional term until a fast response was achieved, then the Integrator term until the system began oscillating, and then finally the Derivative term until the overshoot stopped. Then, each term was tweaked until a smooth yet robust response was achieved.
 
 

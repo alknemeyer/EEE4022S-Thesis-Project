@@ -2,7 +2,7 @@
 
 Once everything had been put together, tests were done to conclude whether the system met the requirements of the researchers.
 
-The setup was as follows: the tracking system was loaded with the Raspberry Pi camera and two GoPro Hero Sessions, one of which was set to record. Another GoPro was placed on a block next to the system, and set to wide angle mode - this acted as a control when comparison was necessary. Since the tests were oriented towards video footage, it is advised to watch a few sample recordings online to get a feel for how the system operates. {\color{red} embed link to saved footage!}
+The setup was as follows: the tracking system was loaded with the Raspberry Pi camera and two GoPro Hero Sessions, one of which was set to record. Another GoPro was placed next to the system, and set to wide angle mode - this acted as a control when comparison was necessary. Since the tests were oriented towards video footage, it is advised to watch a few sample recordings to get a feel for how the system operates. \href{https://www.youtube.com/watch?v=NjCOmwhG3zo}{Click this sentence for a link to the authors submission into the SAIEEE NSPC}, and \href{https://youtu.be/Oea_mKTjV5U}{click this sentence for a link to see two videos which compare the stationary and tracking cameras}.
 
 Due to time constraints, the tests performed were done on humans in a laboratory.
 
@@ -29,11 +29,11 @@ A test was done to see whether the system can track an object moving at higher v
 
 If the object accelerated too quickly, the camera would sometimes fail to estimate the objects velocity before it left the frame and then rotate slowly towards the direction that the object had last been seen in.
 
-If the object moved too quickly, the gimbal would fail to rotate fast enough and again lose sight of the object. However, if the object stopped or slowed down out of frame, the system would find it and start tracking properly again.
+If the object's velocity was too high, the gimbal would fail to rotate fast enough and again lose sight of the object. However, if the object stopped or slowed down out of frame, the system would find it and start tracking properly again.
 
 
 \subsection{Tracking a crouching or elevated object}
-The system could adequately track an object at higher or lower pitch levels. Since more smoothing was applied to the Kalman Filter estimating the pitch of the object, the gimbal would take slightly longer to change its pitch accordingly.
+The system could adequately track an object at higher or lower pitch levels. Since more smoothing was applied to the Kalman Filter estimating the pitch of the object, the gimbal would take slightly longer to change its pitch than it would to change its yaw.
 
 
 \subsection{Tracking partially hidden objects}
@@ -41,7 +41,7 @@ Objects which were partially hidden (for example, a human behind a large chair o
 
 
 \section{Testing the maximum angular tracking range}
-Moving in a circle around the tracker empirically showed that the yaw rotation range was 175\textdegree, while the pitch could track from approximately -45\textdegree (before the system itself started obscuring the object) to 90\textdegree.
+Moving in a circle around the tracker empirically showed that the yaw rotation range was 175\textdegree, while the pitch could track from approximately $-$45\textdegree\ (before the system itself started obscuring the object) to 90\textdegree{}, with 0\textdegree{} being horizontal.
 
 A GoPro Hero Session camera has a maximum field of view of 122\textdegree{} if set to the highest setting.
 

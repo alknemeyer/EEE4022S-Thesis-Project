@@ -1,9 +1,9 @@
 \chapter{Literature Review}
 
-The design of an live object tracker on a low-power computer necessitates several systems, including object detection, a camera gimbal and a Kalman Filter. The literature relevant to these systems are covered in more detail in this chapter.
+The design of a real time object tracker on a low-power computer necessitates several systems, including object detection, a camera gimbal and a Kalman Filter. The literature relevant to these systems are covered in more detail in this chapter.
 
-\section{An introduction to real-time computer-vision based automatic tracking systems}\label{sec:compare_cv_techniques}
-The mechatronics RAM group researchers required a system which can automatically track an object using a camera and computer-vision techniques alone. That requirement is somewhat heavy on jargon, but it can be unpacked as follows:
+\section{An overview of real time computer vision based automatic tracking systems}\label{sec:compare_cv_techniques}
+The mechatronics RAM group researchers required a system which can track an object using a camera and computer vision techniques alone. That requirement is somewhat heavy on jargon, but it can be unpacked as follows:
 
 \textit{Track: follow the trail or movements of (someone or something), typically in order to find them or note their course \cite{website:definition_track}.}
 %
@@ -21,7 +21,7 @@ In contrast, autonomous tracking systems require little to no ongoing human work
 
 \textit{Real time: relating to a system in which input data is processed within milliseconds so that it is available virtually immediately as feedback to the process from which it is coming, e.g. in a guidance system \cite{website:definition_real_time}.}
 %
-Not all tracking systems can (or need to) run in real time. For example, one might film a moving object and then automatically locate the objects position in the video offline. However, certain systems must track an object in real time so as to be able to (for example) orient a camera to point at the object, or result in some other live response.
+Not all tracking systems can (or need to) run in real time. For example, one might film a moving object and then automatically locate the objects position in the video offline. However, certain systems must track an object in real time so as to be able to (for example) orient a camera to point at the object, or result in some other immediate response.
 
 
 
@@ -34,9 +34,9 @@ In contrast, object tracking based on computer vision doesn't require any device
 However, these benefits come at a cost: the object must be close enough to the camera system that the object can be recognised. In contrast, an embedded GPS, IMU and radio system could track objects to the range of the radio system, provided at GPS lock can be achieved.
 
 %https://en.wikipedia.org/wiki/Infra-red_search_and_track
-There are other vision-based systems which don't use computer-vision techniques. For example, infra-red tracking systems tend to not differentiate between classes of objects, but instead track any movement in the frame \cite{sakpere2017state}. These systems tend to be relatively cheap, but since they can't differentiate between types of objects, they don't work for all scenarios. Another issue is that heat-based systems stop working when the external temperature is the same as the temperature of the object being tracked. This is an issue for a system which might track a human with a body temperature of 37.5\textdegree{} in 37\textdegree{} weather.
+There are other vision-based systems which don't use computer-vision techniques. For example, infra-red tracking systems don't usually differentiate between classes of objects, but instead track any movement in the frame \cite{sakpere2017state}. These systems are often relatively cheap, but since they can't differentiate between types of objects, they don't work for all scenarios. Another issue is that heat-based systems stop working when the external temperature is the same as the temperature of the object being tracked. This is an issue for a system which might track a human with a body temperature of 37.5\textdegree{} in 37\textdegree{} weather.
 
-Finally, there are other systems which can track objects without embedding a tracker or using vision. Technologies like radar can send off a ping and then build a view of the environment based on the returning signal \cite{sakpere2017state}. Radar tends to give good range (significantly further than vision would give), but struggles to differentiate between types of objects very well. For example, a radar system \emph{might} be able to differentiate between a car and a human from 1km away, but not human from a dog or car from elephant. It also doesn't work well at closer distances, and tends have a prohibitive cost.
+Finally, there are other systems which can track objects without embedding a tracker or using vision. Technologies like radar can send off a ping and then build a view of the environment based on the returning signal \cite{sakpere2017state}. Radar tends to give good range (significantly further than vision would give), but struggles to differentiate between types of objects very well. For example, a radar system \emph{might} be able to differentiate between a car and a human from 1km away, but not human from a dog or car from elephant. It also doesn't work well at closer distances, and often has a prohibitive cost.
 
 Of course, there are reasons for and against the use of each of these technologies. These should be considered before deciding on a particular approach for a given project.
 
